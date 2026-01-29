@@ -54,10 +54,13 @@ def perform_mca():
     
     # ========== FICHIER 2 : mca_eigenvalues.csv ==========
     print("\n--- Génération mca_eigenvalues.csv ---")
-    explained_inertia = mca.explained_inertia_
+    eigenvalues = mca.eigenvalues_
+    total_inertia = mca.total_inertia_
+    explained_inertia = eigenvalues / total_inertia
+    
     eigenvalues_df = pd.DataFrame({
         'Component': [f'Dim{i+1}' for i in range(n_components)],
-        'Eigenvalue': mca.eigenvalues_,
+        'Eigenvalue': eigenvalues,
         'Explained_Inertia_%': explained_inertia * 100,
         'Cumulative_Inertia_%': np.cumsum(explained_inertia) * 100
     })
@@ -148,10 +151,15 @@ def perform_mca():
     
     # ========== FIGURE 3 : acm_individuals_12_color_target.png ==========
     print("\n--- Génération acm_individuals_12_color_target.png ---")
+    
+    # Reload y from the original dataframe to ensure it's fresh
+    df_colors = pd.read_csv(processed_file)
+    y_colors = df_colors['class']
+    
     plt.figure(figsize=(10, 8))
     
-    # Couleur selon la classe
-    colors = (y == 'e').astype(int)
+    # Couleur selon la classe (convert to numpy array directly)
+    colors = np.array((y_colors == 'e').astype(int))
     scatter = plt.scatter(row_coords.iloc[:, 0], row_coords.iloc[:, 1], 
                          c=colors, cmap='RdYlGn', alpha=0.6, s=20)
     
