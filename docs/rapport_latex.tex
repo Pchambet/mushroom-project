@@ -19,10 +19,12 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 \usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes}
 \usepackage{colortbl}
 
 % Page setup
 \geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
+\setlength{\headheight}{15pt}
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{6pt}
 
@@ -176,7 +178,7 @@ La Figure~\ref{fig:pipeline} illustre la chaîne de traitement complète, de la 
 \begin{tikzpicture}[node distance=1.5cm, auto,
     block/.style={rectangle, draw, fill=blue!20, text width=5em, text centered, rounded corners, minimum height=3em},
     decision/.style={diamond, draw, fill=green!20, text width=4.5em, text badly centered, inner sep=0pt},
-    line/.style={draw, -latex'}]
+    line/.style={draw, -Latex}]
     
     % Nodes
     \node [block] (data) {Données brutes UCI};
