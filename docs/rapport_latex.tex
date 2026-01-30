@@ -3,7 +3,7 @@
 % Packages
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[english]{babel}  % Changed from french to avoid scalefnt dependency
+% babel removed to avoid package errors
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{float}
@@ -254,7 +254,7 @@ Le dataset est quasi-équilibré, ce qui élimine les problèmes de classes dés
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{reports/figures/desc_target_bar.png}
+\includegraphics[width=0.6\textwidth]{../reports/figures/desc_target_bar.png}
 \caption{Distribution de la classe (Comestible vs. Vénéneux)}
 \label{fig:target_dist}
 \end{figure}
@@ -324,19 +324,19 @@ Nous présentons ici la distribution de trois variables morphologiques d'intér�
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{reports/figures/desc_top_modalities_odor.png}
+    \includegraphics[width=\textwidth]{../reports/figures/desc_top_modalities_odor.png}
     \caption{Odeur}
 \end{subfigure}
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{reports/figures/desc_top_modalities_gill-color.png}
+    \includegraphics[width=\textwidth]{../reports/figures/desc_top_modalities_gill-color.png}
     \caption{Couleur des lamelles}
 \end{subfigure}
 
 \vspace{0.5cm}
 
 \begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{reports/figures/desc_top_modalities_spore-print-color.png}
+    \includegraphics[width=\textwidth]{../reports/figures/desc_top_modalities_spore-print-color.png}
     \caption{Couleur de l'empreinte des spores}
 \end{subfigure}
 \caption{Distributions des modalités pour trois variables morphologiques clés}
@@ -458,7 +458,7 @@ La Figure~\ref{fig:scree} présente le scree plot et l'inertie cumulée.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{reports/figures/acm_scree.png}
+\includegraphics[width=\textwidth]{../reports/figures/acm_scree.png}
 \caption{Scree plot : inertie par composante (gauche) et inertie cumulée (droite)}
 \label{fig:scree}
 \end{figure}
@@ -562,7 +562,7 @@ La Figure~\ref{fig:modalities_plan} projette les 111 modalités sur le plan fact
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{reports/figures/acm_modalities_12.png}
+\includegraphics[width=\textwidth]{../reports/figures/acm_modalities_12.png}
 \caption{Plan factoriel des modalités (axes 1-2)}
 \label{fig:modalities_plan}
 \end{figure}
@@ -580,7 +580,7 @@ La Figure~\ref{fig:individuals_plan} projette les 8~124 individus (champignons) 
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{reports/figures/acm_individuals_12_color_target.png}
+\includegraphics[width=0.9\textwidth]{../reports/figures/acm_individuals_12_color_target.png}
 \caption{Plan factoriel des individus (axes 1-2), colorés par classe}
 \label{fig:individuals_plan}
 \end{figure}
@@ -663,7 +663,7 @@ Cette étude a permis d'analyser de manière approfondie le dataset UCI Mushroom
 % ==============================================================================
 % BIBLIOGRAPHIE
 % ==============================================================================
-\begin{thebib liography}{9}
+\begin{thebibliography}{9}
 
 \bibitem{uci}
 Dua, D. and Graff, C. (2019). \textit{UCI Machine Learning Repository}. Irvine, CA: University of California, School of Information and Computer Science. \url{http://archive.ics.uci.edu/ml}
