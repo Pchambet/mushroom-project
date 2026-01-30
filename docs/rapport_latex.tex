@@ -229,11 +229,15 @@ odor\_\_n (no odor)           & -0,62 & 2,36 \\
 
 \textbf{Interprétation} : Axe oppose champignons à texture lisse + odeur forte (pôle +, majoritairement vénéneux) vs. champignons sans odeur + anneau pendant (pôle -, neutres). Pouvoir discriminant fort.
 
+\textbf{Interprétation biologique} : Cette opposition reflète probablement deux stratégies évolutives distinctes. Les champignons du pôle positif (odeur fétide, anneau large, surface soyeuse) présentent des caractéristiques typiques de \textbf{signaux d'avertissement mycologiques} (aposématisme) : l'odeur forte décourage la consommation par la faune, tandis que l'anneau prononcé et la texture distincte facilitent l'identification visuelle. Cette stratégie est cohérente avec leur toxicité (100\% poisonous pour odor\_\_f). À l'inverse, les champignons du pôle négatif (sans odeur, anneau discret) adoptent une stratégie plus cryptique, compatible avec leur comestibilité. L'axe 1 capture donc une \textbf{dichotomie défense chimique vs. neutralité}, où les caractéristiques morphologiques advertissent la présence de toxines.
+
 \subsubsection{Axe 2 (6,91\%) : "Modalités rares"}
 
 \textbf{Top contributions} : \texttt{gill-attachment\_\_a} (8,7\%, effectif 3\%), \texttt{stalk-color-*\_\_o} (7,2\%, effectif <1\%).
 
 \textbf{Interprétation} : Effet de taille (modalités rares éloignées du barycentre). Oppose champignons atypiques vs. "moyens". Moins discriminant pour la classe, utile pour identifier sous-groupes.
+
+\textbf{Interprétation écologique} : L'axe 2 capture la variabilité intra-habitat et les \textbf{niches écologiques spécialisées}. Les champignons à lamelles attachées (gill-attachment\_\_a, 3\% du dataset) et couleurs atypiques (orange, jaune) sont fortement associés à l'habitat "feuilles" (habitat\_\_l, 4,5\% de contribution). Ces modalités rares suggèrent des espèces saprophytes adaptées aux litières forestières, expliquant leurs caractéristiques morphologiques distinctes (ex : lamelles attachées pour stabilité sur substrat friable). Cet axe révèle donc une \textbf{structuration par micro-habitats}, où certaines espèces occupent des niches spécifiques à faible effectif, tandis que la majorité des champignons (modalités fréquentes, origine du plan) colonisent des habitats généralistes.
 
 \subsection{Visualisations et interprétation spatiale}
 
@@ -266,6 +270,19 @@ odor\_\_n (no odor)           & -0,62 & 2,36 \\
 \end{itemize}
 
 \textbf{Conclusion ACM} : La réduction de dimensionnalité est effective (22 variables $\rightarrow$ 5 axes interprétables), avec un axe 1 montrant un fort pouvoir discriminant. La suite de l'analyse (clustering, discriminante) exploitera ces composantes pour modéliser la comestibilité.
+
+\subsection{Discussion mycologique}
+
+\textbf{Synthèse biologique} : L'ACM révèle que la distinction comestible/vénéneux repose sur des \textbf{syndromes morpho-chimiques cohérents}. Les champignons vénéneux (pôle + axe 1) combinent :
+\begin{itemize}
+    \item \textbf{Défense chimique} : odeur fétide (composés soufrés volatils type thiols, indoles)
+    \item \textbf{Signalisation visuelle} : anneau large, empreinte chocolat (possiblement corrélée à mélanines toxiques)
+    \item \textbf{Texture distinctive} : surface soyeuse (cuticule épaisse, barrière aux prédateurs)
+\end{itemize}
+
+Cette stratégie d'\textbf{aposématisme multi-modal} (olfactif + visuel + tactile) maximise l'évitement par la faune. À l'inverse, les champignons comestibles minimisent ces signaux, favorisant la dispersion des spores par consommation.
+
+\textbf{Implications évolutives} : La forte contribution de \texttt{odor} à l'axe 1 suggère que la sélection naturelle a favorisé le couplage toxicité-odeur comme mécanisme d'apprentissage rapide chez les prédateurs (conditionnement aversif). Les axes 2-5 capturent des variations secondaires (habitat, couleur) reflétant l'adaptation à des niches écologiques, indépendamment de la comestibilité.
 
 \subsection{Export}
 
