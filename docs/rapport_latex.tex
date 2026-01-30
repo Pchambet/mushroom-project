@@ -234,23 +234,37 @@ odor\_\_n (no odor)           & -0,62 & 2,36 \\
 
 \textbf{Interprétation} : Effet de taille (modalités rares éloignées du barycentre). Oppose champignons atypiques vs. "moyens". Moins discriminant pour la classe, utile pour identifier sous-groupes.
 
-\subsection{Visualisations}
+\subsection{Visualisations et interprétation spatiale}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{../reports/figures/acm_modalities_12.png}
+\includegraphics[width=0.7\textwidth]{../reports/figures/acm_modalities_12.png}
 \caption{Plan factoriel des modalités (axes 1-2)}
 \label{fig:modalities}
 \end{figure}
 
+\textbf{Analyse spatiale des modalités} (Fig.~\ref{fig:modalities}) :
+\begin{itemize}
+    \item \textbf{Dispersion axe 1} : Opposition claire entre modalités à gauche (\texttt{odor\_\_n}, \texttt{ring-type\_\_p}) et à droite (\texttt{odor\_\_f}, \texttt{ring-type\_\_l}), confirmant l'interprétation "surface + odeur"
+    \item \textbf{Modalités excentrées axe 2} : Les modalités rares (\texttt{gill-attachment\_\_a}, \texttt{gill-color\_\_y}) sont très éloignées du centre, illustrant l'effet de taille
+    \item \textbf{Centre de gravité} : Les modalités fréquentes se concentrent autour de l'origine (\texttt{cap-shape\_\_x}, \texttt{gill-attachment\_\_f})
+\end{itemize}
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth]{../reports/figures/acm_individuals_12_color_target.png}
+\includegraphics[width=0.7\textwidth]{../reports/figures/acm_individuals_12_color_target.png}
 \caption{Plan factoriel des individus (axes 1-2), colorés par classe}
 \label{fig:individuals}
 \end{figure}
 
-\textbf{Observation} (Fig.~\ref{fig:individuals}) : Séparation partielle edible/poisonous sur l'axe 1, nuages se chevauchent. Les 5 axes (31,3\% inertie) amélioreront la discrimination (sections 4-5).
+\textbf{Analyse de la séparation des classes} (Fig.~\ref{fig:individuals}) :
+\begin{itemize}
+    \item \textbf{Tendance de séparation} : Les champignons vénéneux (rouge) se concentrent plutôt à droite de l'axe 1, les comestibles (vert) à gauche, cohérent avec les contributions (odor\_\_f vs. odor\_\_n)
+    \item \textbf{Chevauchement important} : Les nuages se superposent fortement, indiquant que les axes 1-2 seuls (14,5\% inertie) ne suffisent pas pour une discrimination parfaite
+    \item \textbf{Potentiel discriminant} : L'utilisation des 5 premiers axes (31,3\% inertie cumulée) dans l'analyse discriminante (Section~5) devrait significativement améliorer la séparation
+\end{itemize}
+
+\textbf{Conclusion ACM} : La réduction de dimensionnalité est effective (22 variables $\rightarrow$ 5 axes interprétables), avec un axe 1 montrant un fort pouvoir discriminant. La suite de l'analyse (clustering, discriminante) exploitera ces composantes pour modéliser la comestibilité.
 
 \subsection{Export}
 
@@ -288,23 +302,6 @@ L'ACM a révélé que les caractéristiques de surface et d'odeur constituent le
 
 \textbf{Perspectives} : Comparer avec Random Forest, tester sur autres datasets mycologiques.
 
-% ==============================================================================
-% BIBLIOGRAPHIE
-% ==============================================================================
-\begin{thebibliography}{9}
 
-\bibitem{uci}
-Dua, D. and Graff, C. (2019). \textit{UCI Machine Learning Repository}. \url{http://archive.ics.uci.edu/ml}
-
-\bibitem{audubon}
-Lincoff, G. H. (1981). \textit{The Audubon Society Field Guide to North American Mushrooms}. Alfred A. Knopf.
-
-\bibitem{lebart}
-Lebart, L., Morineau, A., et Piron, M. (2006). \textit{Statistique exploratoire multidimensionnelle}. Dunod.
-
-\bibitem{pages}
-Pagès, J. (2014). \textit{Multiple Factor Analysis by Example Using R}. Chapman \& Hall/CRC.
-
-\end{thebibliography}
 
 \end{document}
