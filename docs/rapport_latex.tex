@@ -3,7 +3,6 @@
 % Packages
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-% babel removed to avoid package errors
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{float}
@@ -12,15 +11,11 @@
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{array}
-\usepackage{longtable}
 \usepackage{caption}
 \usepackage{subcaption}
 \usepackage{xcolor}
 \usepackage{hyperref}
 \usepackage{fancyhdr}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, shapes}
-\usepackage{colortbl}
 
 % Page setup
 \geometry{left=2.5cm, right=2.5cm, top=2.5cm, bottom=2.5cm}
@@ -44,19 +39,13 @@
     citecolor=blue
 }
 
-% Custom commands
-\newcommand{\bfig}[1]{\textbf{Figure #1}}
-\newcommand{\btab}[1]{\textbf{Tableau #1}}
-
 % Title page info
-\title{\textbf{Projet d'Analyse des Données Qualitatives} \\ 
-       \large Analyse Factorielle et Classification du Dataset Mushroom}
+\title{\textbf{Analyse Multivariée du Dataset UCI Mushroom} \\ 
+       \large ACM, Clustering et Analyse Discriminante}
 \author{[Nom Personne A] \and [Nom Personne B] \and [Nom Personne C]}
 \date{Janvier 2026 \\ 
-      \vspace{0.5cm}
-      \small Université [Nom] \\
-      Master [Spécialité] \\
-      Enseignant : [Nom Prof]}
+      \vspace{0.3cm}
+      \small Université [Nom] - Master [Spécialité]}
 
 \begin{document}
 
@@ -66,19 +55,13 @@
 \maketitle
 \thispagestyle{empty}
 
-\vspace{2cm}
-
 \begin{abstract}
-Ce rapport présente une analyse complète du dataset UCI Mushroom, composé de 8~124 observations de champignons décrits par 23 variables qualitatives. L'objectif est de comprendre la structure des profils de champignons et d'identifier les caractéristiques discriminantes entre champignons comestibles et vénéneux. Nous appliquons une démarche structurée : statistiques descriptives, Analyse des Correspondances Multiples (ACM), classification non supervisée sur les composantes factorielles, et analyse discriminante. Les résultats révèlent que les caractéristiques de surface, l'odeur, et la couleur constituent les principaux axes de variation, permettant une discrimination efficace entre les deux classes.
+\noindent Ce rapport présente une analyse du dataset UCI Mushroom (8~124 champignons, 23 variables qualitatives) pour discriminer champignons comestibles et vénéneux. Nous appliquons une démarche structurée : Analyse des Correspondances Multiples (ACM), clustering sur composantes factorielles, et analyse discriminante. L'ACM révèle que les caractéristiques d'odeur et de surface constituent les axes principaux de variation (31,3\% d'inertie cumulée sur 5 axes).
 \end{abstract}
 
-\textbf{Mots-clés :} Analyse des Correspondances Multiples, Classification non supervisée, Analyse discriminante, Données qualitatives, Champignons
+\textbf{Mots-clés :} ACM, Classification non supervisée, Analyse discriminante, Données qualitatives
 
 \newpage
-
-% ==============================================================================
-% TABLE DES MATIÈRES
-% ==============================================================================
 \tableofcontents
 \newpage
 
@@ -87,239 +70,85 @@ Ce rapport présente une analyse complète du dataset UCI Mushroom, composé de 
 % ==============================================================================
 \section{Introduction}
 
-L'identification des champignons comestibles constitue un enjeu majeur en mycologie, où une erreur de classification peut avoir des conséquences graves. Le dataset UCI Mushroom, issu du \textit{Audubon Society Field Guide to North American Mushrooms} (1981), regroupe 8~124 observations de champignons décrits par 23 variables qualitatives morphologiques, telles que la forme du chapeau, l'odeur, la couleur des lamelles, ou encore la surface du pied.
-
-\subsection{Motivation de l'étude}
-
-Ce jeu de données présente plusieurs caractéristiques qui en font un cas d'étude idéal pour l'analyse de données qualitatives :
-\begin{itemize}
-    \item \textbf{Richesse des variables} : 23 attributs qualitatifs couvrant différents aspects morphologiques
-    \item \textbf{Taille substantielle} : Plus de 8~000 individus permettant des analyses statistiques robustes
-    \item \textbf{Problématique binaire claire} : Classification edible (comestible) vs. poisonous (vénéneux)
-    \item \textbf{Complexité des relations} : Interactions multiples entre variables morphologiques
-\end{itemize}
+Le dataset UCI Mushroom regroupe 8~124 champignons décrits par 23 variables morphologiques qualitatives (forme du chapeau, odeur, couleur des lamelles, etc.). L'objectif est d'identifier les profils-types et les caractéristiques discriminantes pour la comestibilité.
 
 \subsection{Démarche analytique}
 
-Conformément aux exigences du projet, nous appliquons une méthodologie structurée en quatre étapes :
+Nous appliquons une méthodologie articulée en trois étapes :
 
 \begin{enumerate}
-    \item \textbf{Statistiques descriptives} : Exploration univariée et bivariée pour comprendre la distribution des variables et identifier les modalités dominantes
-    
-    \item \textbf{Analyse des Correspondances Multiples (ACM)} : Réduction de dimensionnalité permettant de visualiser les profils de champignons dans un espace factoriel et d'identifier les axes de variation principaux
-    
-    \item \textbf{Classification non supervisée} : Clustering (CAH et K-means) sur les coordonnées factorielles pour identifier des groupes naturels de champignons partageant des profils similaires
-    
-    \item \textbf{Analyse discriminante} : Modélisation supervisée sur les composantes ACM pour expliquer et prédire la classe edible/poisonous, dans l'esprit de l'approche DISQUAL
+    \item \textbf{ACM} : Réduction de dimensionnalité (23 variables $\rightarrow$ 5 axes factoriels, 31,3\% d'inertie)
+    \item \textbf{Clustering} : Segmentation non supervisée sur composantes (CAH, K-means)
+    \item \textbf{Analyse discriminante} : Modélisation prédictive edible/poisonous sur facteurs ACM
 \end{enumerate}
 
-Cette démarche permet de combiner exploration (non supervisée) et prédiction (supervisée) tout en valorisant la richesse des données qualitatives.
-
-\subsection{Structure du rapport}
-
-Le rapport s'organise comme suit : la Section~\ref{sec:probleme} définit le problème, les objectifs et la démarche complète ; la Section~\ref{sec:donnees} présente les données, le dictionnaire des variables et les statistiques descriptives ; la Section~\ref{sec:acm} détaille l'ACM et l'interprétation des axes factoriels ; les Sections~5 et 6 (réalisées par Personne B) couvrent respectivement le clustering et l'analyse discriminante ; enfin, la Section~7 conclut avec une synthèse des résultats et des perspectives.
+Cette approche permet de combiner exploration et prédiction tout en valorisant la nature qualitative des données.
 
 % ==============================================================================
-% 2. PROBLÈME, OBJECTIF ET DÉMARCHE
+% 2. DONNÉES
 % ==============================================================================
-\section{Problème, objectif et démarche}
-\label{sec:probleme}
+\section{Données et préparation}
 
-\subsection{Problématique}
+\subsection{Description du dataset}
 
-La classification des champignons repose sur l'expertise de mycologues capables d'identifier les espèces à partir de caractéristiques morphologiques. Cependant, cette expertise n'est pas universellement accessible, et les erreurs d'identification peuvent être fatales. La question centrale de cette étude est :
+\textbf{Source} : UCI Machine Learning Repository (\textit{Audubon Society Field Guide}, 1981)
 
-\begin{quote}
-\textit{Peut-on identifier des profils-types de champignons et déterminer quelles caractéristiques morphologiques sont les plus discriminantes pour distinguer champignons comestibles et vénéneux ?}
-\end{quote}
+\textbf{Dimensions} : $n = 8~124$ champignons, $p = 23$ variables qualitatives, $K = 111$ modalités totales
 
-Cette problématique se décline en trois sous-questions :
-\begin{itemize}
-    \item \textbf{Structure latente} : Existe-t-il des axes de variation principaux qui résument l'information contenue dans les 23 variables ?
-    \item \textbf{Groupes naturels} : Les champignons se regroupent-ils naturellement en clusters homogènes ?
-    \item \textbf{Discrimination} : Quelles variables/modalités permettent de prédire efficacement la comestibilité ?
-\end{itemize}
-
-\subsection{Objectifs de l'étude}
-
-\subsubsection{Objectif 1 : Exploration et réduction de dimensionnalité}
-
-L'ACM vise à :
-\begin{itemize}
-    \item Réduire la dimensionnalité de 23 variables à quelques axes factoriels interprétables
-    \item Identifier les oppositions majeures entre modalités (e.g., odeur forte vs. absence d'odeur)
-    \item Visualiser les profils de champignons dans un espace factoriel
-\end{itemize}
-
-\subsubsection{Objectif 2 : Segmentation non supervisée}
-
-Le clustering sur composantes ACM permet de :
-\begin{itemize}
-    \item Découvrir des groupes homogènes sans utiliser l'information de classe
-    \item Profiler chaque cluster (modalités sur/sous-représentées)
-    \item Évaluer la concordance entre clusters et classes edible/poisonous
-\end{itemize}
-
-\subsubsection{Objectif 3 : Modélisation supervisée}
-
-L'analyse discriminante sur facteurs ACM (approche DISQUAL) vise à :
-\begin{itemize}
-    \item Construire un modèle prédictif de la comestibilité basé sur les composantes
-    \item Quantifier la performance de classification (matrice de confusion, taux de succès)
-    \item Identifier les axes factoriels les plus discriminants
-\end{itemize}
-
-\subsection{Démarche globale : pipeline analytique}
-
-La Figure~\ref{fig:pipeline} illustre la chaîne de traitement complète, de la collecte des données aux résultats finaux.
+\textbf{Variable cible} : \texttt{class} $\in$ \{e (edible), p (poisonous)\}, distribution équilibrée (51,8\% vs. 48,2\%)
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.5cm, auto,
-    block/.style={rectangle, draw, fill=blue!20, text width=5em, text centered, rounded corners, minimum height=3em},
-    decision/.style={diamond, draw, fill=green!20, text width=4.5em, text badly centered, inner sep=0pt},
-    line/.style={draw, -Latex}]
-    
-    % Nodes
-    \node [block] (data) {Données brutes UCI};
-    \node [block, below of=data] (prep) {Préparation \\ (nettoyage)};
-    \node [block, below of=prep] (desc) {Stat. descriptives};
-    \node [block, below of=desc] (acm) {ACM};
-    \node [block, below of=acm, xshift=-3cm] (cluster) {Clustering \\ (CAH/K-means)};
-    \node [block, below of=acm, xshift=3cm] (discr) {Analyse \\ discriminante};
-    \node [block, below of=cluster, xshift=3cm] (results) {Résultats \\ \& Interprétation};
-    
-    % Arrows
-    \path [line] (data) -- (prep);
-    \path [line] (prep) -- (desc);
-    \path [line] (desc) -- (acm);
-    \path [line] (acm) -- node [near start, left] {coords} (cluster);
-    \path [line] (acm) -- node [near start, right] {coords} (discr);
-    \path [line] (cluster) -- (results);
-    \path [line] (discr) -- (results);
-\end{tikzpicture}
-\caption{Pipeline analytique : de la collecte des données à l'interprétation finale}
-\label{fig:pipeline}
-\end{figure}
-
-\textbf{Justification de la démarche} : L'utilisation de l'ACM comme étape intermédiaire est motivée par :
-\begin{itemize}
-    \item \textbf{Nature des données} : Variables exclusivement qualitatives (incompatibles avec PCA)
-    \item \textbf{Dimensionnalité} : 23 variables génèrent un tableau disjonctif complet de grande dimension
-    \item \textbf{Interprétabilité} : Les axes factoriels sont plus interprétables que les variables brutes
-    \item \textbf{Efficacité} : Réduire le bruit et conserver l'information discriminante
-\end{itemize}
-
-% ==============================================================================
-% 3. DONNÉES : DESCRIPTION ET PRÉPARATION
-% ==============================================================================
-\section{Données : description et préparation}
-\label{sec:donnees}
-
-\subsection{Source et contenu du dataset}
-
-\subsubsection{Origine}
-
-Le dataset \textit{UCI Mushroom} provient du \textit{UC Irvine Machine Learning Repository}. Il a été construit à partir du guide \textit{Audubon Society Field Guide to North American Mushrooms} (1981) et décrit 23 espèces de champignons à lamelles des familles \textit{Agaricus} et \textit{Lepiota}.
-
-\subsubsection{Dimensions}
-
-\begin{itemize}
-    \item \textbf{Nombre d'individus} : $n = 8~124$ champignons
-    \item \textbf{Nombre de variables} : $p = 23$ variables qualitatives (dont 1 variable cible)
-    \item \textbf{Conformité} : Le dataset respecte largement les contraintes du projet ($n \geq 150$ et $p \geq 10$)
-\end{itemize}
-
-\subsubsection{Variable cible}
-
-\texttt{class} : Indique si le champignon est comestible (\texttt{e}) ou vénéneux (\texttt{p}).
-
-\begin{table}[H]
-\centering
-\caption{Distribution de la variable cible}
-\label{tab:target_dist}
-\begin{tabular}{lrr}
-\toprule
-\textbf{Classe} & \textbf{Effectif} & \textbf{Pourcentage} \\
-\midrule
-Comestible (e) & 4~208 & 51,8\% \\
-Vénéneux (p)   & 3~916 & 48,2\% \\
-\midrule
-\textbf{Total} & \textbf{8~124} & \textbf{100,0\%} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-Le dataset est quasi-équilibré, ce qui élimine les problèmes de classes déséquilibrées pour la modélisation supervisée.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{../reports/figures/desc_target_bar.png}
-\caption{Distribution de la classe (Comestible vs. Vénéneux)}
+\includegraphics[width=0.5\textwidth]{../reports/figures/desc_target_bar.png}
+\caption{Distribution de la classe}
 \label{fig:target_dist}
 \end{figure}
 
-\subsection{Dictionnaire des variables}
+\subsection{Preprocessing}
 
-Le Tableau~\ref{tab:data_dict} présente un résumé des 23 variables morphologiques. Le dictionnaire complet avec toutes les modalités est fourni en Annexe~A.
+\textbf{Valeurs manquantes} : La variable \texttt{stalk-root} contient 2~480 valeurs "?" (30,5\%). Stratégie : imputation modale (modalité "b" = bulbous). Justification : préserve la distribution, évite la perte de 30\% des données, compatible ACM.
+
+\subsection{Statistiques descriptives}
+
+Le Tableau~\ref{tab:top_vars} présente les 6 variables clés.
 
 \begin{table}[H]
 \centering
-\caption{Résumé des variables du dataset (Top 10)}
-\label{tab:data_dict}
+\caption{Variables principales (top 6)}
+\label{tab:top_vars}
 \small
-\begin{tabular}{p{4cm}rp{2.5cm}rrr}
+\begin{tabular}{lrrr}
 \toprule
-\textbf{Variable} & \textbf{$N_{mod}$} & \textbf{Modalité top} & \textbf{Freq. (\%)} & \textbf{NA (\%)} \\
+\textbf{Variable} & \textbf{$N_{mod}$} & \textbf{Top modalité} & \textbf{Freq. (\%)} \\
 \midrule
-class & 2 & e & 51,8 & 0,0 \\
-cap-shape & 6 & x (convex) & 45,0 & 0,0 \\
-cap-surface & 4 & y (scaly) & 39,9 & 0,0 \\
-cap-color & 10 & n (brown) & 28,1 & 0,0 \\
-bruises & 2 & f (no) & 58,4 & 0,0 \\
-odor & 9 & n (none) & 43,4 & 0,0 \\
-gill-attachment & 2 & f (free) & 97,4 & 0,0 \\
-gill-spacing & 2 & c (close) & 83,9 & 0,0 \\
-gill-size & 2 & b (broad) & 69,1 & 0,0 \\
-gill-color & 12 & b (buff) & 21,3 & 0,0 \\
+class & 2 & e (edible) & 51,8 \\
+odor & 9 & n (none) & 43,4 \\
+gill-color & 12 & b (buff) & 21,3 \\
+spore-print-color & 9 & w (white) & 29,4 \\
+cap-color & 10 & n (brown) & 28,1 \\
+gill-attachment & 2 & f (free) & 97,4 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Observations clés} :
-\begin{itemize}
-    \item Certaines variables sont très déséquilibrées (\texttt{gill-attachment} : 97,4\% de modalité \texttt{f})
-    \item Le nombre de modalités varie de 2 à 12 selon les variables
-    \item La variable \texttt{stalk-root} contient 30,5\% de valeurs manquantes (voir section suivante)
-\end{itemize}
+\textbf{Analyse bivariée odeur $\times$ classe} (Tableau~\ref{tab:odor_class}) : association quasi-parfaite. Les odeurs agréables (almond, anise) sont 100\% comestibles ; les odeurs fétides (foul, pungent) sont 100\% vénéneuses. Variable hautement discriminante.
 
-\subsection{Nettoyage et préparation des données}
-
-\subsubsection{Gestion des valeurs manquantes}
-
-La variable \texttt{stalk-root} présente 2~480 valeurs manquantes (30,5\% du dataset), encodées par le symbole <<~?~>> dans les données brutes.
-
-\textbf{Stratégie retenue} : Remplacement par imputation modale
-\begin{itemize}
-    \item Les valeurs <<~?~>> sont remplacées par la modalité la plus fréquente de \texttt{stalk-root} (\texttt{b} : bulbous)
-    \item \textbf{Justification} : Cette approche préserve la distribution majoritaire tout en permettant l'utilisation de tous les individus dans l'ACM
-    \item \textbf{Alternative} : Suppression des lignes (perte de 30\% des données) ou création d'une modalité <<~missing~>> (augmente artificiellement le nombre de modalités)
-\end{itemize}
-
-\subsubsection{Vérification de la qualité}
-
-Après nettoyage :
-\begin{itemize}
-    \item \textbf{Aucune valeur manquante résiduelle}
-    \item \textbf{Toutes les variables sont de type qualitatif} (nominal/ordinal)
-    \item \textbf{Pas de modalité ultra-rare} nécessitant un regroupement (seuil : $>$0,5\%)
-\end{itemize}
-
-\subsection{Statistiques descriptives}
-
-\subsubsection{Analyse univariée : distributions des variables clés}
-
-Nous présentons ici la distribution de trois variables morphologiques d'intérêt : \texttt{odor}, \texttt{gill-color}, et \texttt{spore-print-color}.
+\begin{table}[H]
+\centering
+\caption{Tableau croisé odeur $\times$ classe (extrait)}
+\label{tab:odor_class}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Odeur} & \textbf{Comestible} & \textbf{Vénéneux} & \textbf{Total} \\
+\midrule
+none (n)    & 3~408 & 120   & 3~528 \\
+\textbf{foul (f)}    & \textbf{0}     & \textbf{2~160} & \textbf{2~160} \\
+\textbf{almond (a)}  & \textbf{400}   & \textbf{0}     & \textbf{400}   \\
+\textbf{anise (l)}   & \textbf{400}   & \textbf{0}     & \textbf{400}   \\
+pungent (p) & 0     & 256   & 256   \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \begin{figure}[H]
 \centering
@@ -330,335 +159,134 @@ Nous présentons ici la distribution de trois variables morphologiques d'intér�
 \hfill
 \begin{subfigure}[b]{0.48\textwidth}
     \includegraphics[width=\textwidth]{../reports/figures/desc_top_modalities_gill-color.png}
-    \caption{Couleur des lamelles}
+    \caption{Couleur lamelles}
 \end{subfigure}
-
-\vspace{0.5cm}
-
-\begin{subfigure}[b]{0.48\textwidth}
-    \includegraphics[width=\textwidth]{../reports/figures/desc_top_modalities_spore-print-color.png}
-    \caption{Couleur de l'empreinte des spores}
-\end{subfigure}
-\caption{Distributions des modalités pour trois variables morphologiques clés}
+\caption{Distributions des modalités clés}
 \label{fig:desc_modalities}
 \end{figure}
 
-\textbf{Observations} :
-\begin{itemize}
-    \item \textbf{Odeur} : Près de 43\% des champignons n'ont pas d'odeur (\texttt{n}), tandis que les odeurs fortes (\texttt{f} : foul, \texttt{p} : pungent) concernent environ 25\% des individus
-    \item \textbf{Couleur des lamelles} : Distribution très fragmentée avec 12 modalités, la plus fréquente étant \texttt{b} (buff) à 21\%
-    \item \textbf{Empreinte des spores} : Dominée par le blanc (\texttt{w}, 29\%), suivie par le marron (\texttt{n}, 24\%) et le noir (\texttt{k}, 19\%)
-\end{itemize}
-
-\subsubsection{Analyse bivariée : relations avec la classe}
-
-Le Tableau~\ref{tab:odor_class} présente le tableau croisé entre \texttt{odor} et \texttt{class}, révélant une association forte.
-
-\begin{table}[H]
-\centering
-\caption{Tableau croisé : Odeur $\times$ Classe}
-\label{tab:odor_class}
-\begin{tabular}{lrrr}
-\toprule
-\textbf{Odeur} & \textbf{Comestible} & \textbf{Vénéneux} & \textbf{Total} \\
-\midrule
-n (none)       & 3~408 & 120   & 3~528 \\
-f (foul)       & 0     & 2~160 & 2~160 \\
-a (almond)     & 400   & 0     & 400   \\
-l (anise)      & 400   & 0     & 400   \\
-p (pungent)    & 0     & 256   & 256   \\
-\textit{Autres} & 0     & 1~380 & 1~380 \\
-\midrule
-\textbf{Total} & \textbf{4~208} & \textbf{3~916} & \textbf{8~124} \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Analyse} : Les odeurs \texttt{a} (almond) et \texttt{l} (anise) sont exclusivement associées aux champignons comestibles, tandis que \texttt{f} (foul) et \texttt{p} (pungent) sont des indicateurs quasi-parfaits de toxicité. Cette variable sera donc probablement très discriminante dans l'analyse factorielle et la modélisation supervisée.
-
-\subsection{Synthèse}
-
-Le dataset Mushroom est de haute qualité :
-\begin{itemize}
-    \item \textbf{Taille robuste} : 8~124 observations permettent des analyses statistiques fiables
-    \item \textbf{Richesse} : 23 variables qualitatives couvrant différents aspects morphologiques
-    \item \textbf{Équilibre} : Classes quasi-équilibrées (51,8\% vs. 48,2\%)
-    \item \textbf{Propreté} : Après nettoyage, aucune valeur manquante résiduelle
-\end{itemize}
-
-Les statistiques descriptives révèlent déjà des patterns prometteurs : certaines variables (\texttt{odor}, \texttt{spore-print-color}) semblent fortement associées à la comestibilité. L'ACM (Section~\ref{sec:acm}) permettra de synthétiser ces informations et de révéler la structure latente des données.
-
 % ==============================================================================
-% 4. ANALYSE DES CORRESPONDANCES MULTIPLES (ACM)
+% 3. ACM
 % ==============================================================================
 \section{Analyse des Correspondances Multiples (ACM)}
-\label{sec:acm}
 
-\subsection{Rappel méthodologique}
+\subsection{Méthodologie}
 
-\subsubsection{Principe de l'ACM}
+L'ACM transforme les 22 variables descriptives (111 modalités) en axes factoriels orthogonaux via le Tableau Disjonctif Complet (TDC). Inertie totale : $I_{tot} \approx 4.27$.
 
-L'Analyse des Correspondances Multiples est une technique de réduction de dimensionnalité adaptée aux variables qualitatives. Elle généralise l'Analyse Factorielle des Correspondances (AFC) au cas de $p$ variables qualitatives.
+\subsection{Choix du nombre d'axes}
 
-\textbf{Construction du tableau disjonctif complet (TDC)} :
-\begin{itemize}
-    \item Chaque variable $V_j$ à $k_j$ modalités est transformée en $k_j$ variables indicatrices binaires
-    \item Le TDC résultant a $n$ lignes (individus) et $K = \sum_{j=1}^p k_j$ colonnes (modalités)
-    \item Dans notre cas : $p = 22$ variables (hors \texttt{class}) $\rightarrow$ $K = 111$ modalités au total
-\end{itemize}
-
-\textbf{Diagonalisation} : L'ACM effectue une diagonalisation du tableau de Burt (matrice $K \times K$ des croisements de modalités) et extrait les axes factoriels maximisant l'inertie expliquée.
-
-\textbf{Inertie totale} : Dans une ACM, l'inertie totale vaut :
-\[
-I_{tot} = \frac{p - K/p}{p} = \frac{22 - 111/22}{22} \approx 4.27
-\]
-
-\subsubsection{Interprétation des résultats}
-
-\begin{itemize}
-    \item \textbf{Valeurs propres} : Mesurent la part de variance expliquée par chaque axe
-    \item \textbf{Contributions} : Identifient les modalités qui <<~pèsent~>> le plus sur un axe
-    \item \textbf{Cos²} (qualité de représentation) : Mesure la qualité de projection d'une modalité/individu sur un axe
-\end{itemize}
-
-\subsection{Résultats globaux : choix du nombre d'axes}
-
-\subsubsection{Tableau des valeurs propres}
-
-Le Tableau~\ref{tab:eigenvalues} présente les 10 premières valeurs propres et les inerties expliquées associées.
+Nous conservons \textbf{k = 5 axes} (31,3\% d'inertie cumulée). Justification : coude visible après l'axe 5 (Fig.~\ref{fig:scree}), compromis interprétabilité/information.
 
 \begin{table}[H]
 \centering
-\caption{Valeurs propres et inerties expliquées (ACM)}
+\caption{Valeurs propres et inerties}
 \label{tab:eigenvalues}
 \begin{tabular}{lrrr}
 \toprule
-\textbf{Axe} & \textbf{Valeur propre} & \textbf{Inertie (\%)} & \textbf{Inertie cum. (\%)} \\
+\textbf{Axe} & \textbf{$\lambda$} & \textbf{Inertie (\%)} & \textbf{Cumul (\%)} \\
 \midrule
 Dim1 & 0,324 & 7,59 & 7,59 \\
 Dim2 & 0,295 & 6,91 & 14,49 \\
 Dim3 & 0,271 & 6,33 & 20,83 \\
 Dim4 & 0,243 & 5,68 & 26,51 \\
 Dim5 & 0,203 & 4,76 & \textbf{31,27} \\
-Dim6 & 0,193 & 4,51 & 35,78 \\
-Dim7 & 0,173 & 4,06 & 39,83 \\
-Dim8 & 0,144 & 3,38 & 43,21 \\
-Dim9 & 0,103 & 2,42 & 45,62 \\
-Dim10 & 0,096 & 2,25 & 47,88 \\
 \bottomrule
 \end{tabular}
 \end{table}
-
-\textbf{Remarque} : Les inerties individuelles sont faibles (< 10\%), ce qui est typique en ACM lorsque le nombre de modalités $K$ est élevé. L'inertie se disperse sur de nombreux axes.
-
-\subsubsection{Scree plot et règle de Kaiser}
-
-La Figure~\ref{fig:scree} présente le scree plot et l'inertie cumulée.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{../reports/figures/acm_scree.png}
-\caption{Scree plot : inertie par composante (gauche) et inertie cumulée (droite)}
+\caption{Scree plot et inertie cumulée}
 \label{fig:scree}
 \end{figure}
 
-\textbf{Analyse} :
-\begin{itemize}
-    \item \textbf{Coude} : Un coude est visible après les axes 5-6, suggérant que les axes suivants apportent peu d'information supplémentaire
-    \item \textbf{Règle des 90\%} : Il faudrait plus de 20 axes pour atteindre 90\% d'inertie cumulée (non réaliste)
-    \item \textbf{Compromis retenu} : Nous conservons \textbf{k = 5 axes} (31,27\% d'inertie cumulée), offrant un équilibre entre interprétabilité et conservation de l'information
-\end{itemize}
-
 \subsection{Interprétation des axes factoriels}
 
-Nous interprétons ici les deux premiers axes, qui concentrent 14,49\% de l'inertie totale.
+\subsubsection{Axe 1 (7,59\%) : "Surface et Odeur"}
 
-\subsubsection{Axe 1 (7,59\%) : <<~Caractéristiques de surface et anneau~>>}
-
-Le Tableau~\ref{tab:contrib_dim1} présente les modalités contribuant le plus à l'axe 1.
+\textbf{Top contributions} (Table~\ref{tab:contrib_dim1}) : \texttt{ring-type\_\_l} (anneau large, 6,68\%), \texttt{stalk-surface-*\_\_k} (surface soyeuse, 6,4\%), \texttt{odor\_\_f} (odeur fétide, 5,49\%).
 
 \begin{table}[H]
 \centering
-\caption{Top 10 des contributions à l'axe 1}
+\caption{Top 5 contributions axe 1}
 \label{tab:contrib_dim1}
 \small
 \begin{tabular}{lrr}
 \toprule
-\textbf{Modalité} & \textbf{Coordonnée} & \textbf{Contribution (\%)} \\
+\textbf{Modalité} & \textbf{Coord.} & \textbf{Contrib. (\%)} \\
 \midrule
-ring-type\_\_l (large ring)        & 1,728 & 6,68 \\
-stalk-surface-below-ring\_\_k (silky) & 1,270 & 6,42 \\
-stalk-surface-above-ring\_\_k (silky) & 1,219 & 6,09 \\
-odor\_\_f (foul)                   & 1,213 & 5,49 \\
-spore-print-color\_\_h (chocolate) & 1,333 & 5,01 \\
-ring-type\_\_p (pendant)           & -0,667 & 3,05 \\
-bruises\_\_t (bruises present)     & -0,654 & 2,49 \\
-stalk-color-below-ring\_\_b (buff) & 1,796 & 2,41 \\
-odor\_\_n (no odor)                & -0,622 & 2,36 \\
+ring-type\_\_l (large)        & +1,73 & 6,68 \\
+stalk-surface-below-ring\_\_k & +1,27 & 6,41 \\
+odor\_\_f (foul)              & +1,21 & 5,49 \\
+ring-type\_\_p (pendant)      & -0,67 & 3,05 \\
+odor\_\_n (no odor)           & -0,62 & 2,36 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{Interprétation} :
+\textbf{Interprétation} : Axe oppose champignons à texture lisse + odeur forte (pôle +, majoritairement vénéneux) vs. champignons sans odeur + anneau pendant (pôle -, neutres). Pouvoir discriminant fort.
 
-\textbf{Pôle positif} (coordonnées > 0) : Champignons avec anneau large (\texttt{ring-type\_\_l}), surface du pied soyeuse (\texttt{stalk-surface-*\_\_k}), odeur forte et désagréable (\texttt{odor\_\_f}), empreinte de spores chocolat (\texttt{spore-print-color\_\_h}).
+\subsubsection{Axe 2 (6,91\%) : "Modalités rares"}
 
-\textbf{Pôle négatif} (coordonnées < 0) : Champignons avec anneau pendant (\texttt{ring-type\_\_p}), présence de bleus (\texttt{bruises\_\_t}), absence d'odeur (\texttt{odor\_\_n}).
+\textbf{Top contributions} : \texttt{gill-attachment\_\_a} (8,7\%, effectif 3\%), \texttt{stalk-color-*\_\_o} (7,2\%, effectif <1\%).
 
-\textbf{Sens de l'axe} : L'axe 1 oppose les champignons à \textbf{surface lisse/soyeuse + odeur forte} (pôle positif) aux champignons à \textbf{anneau pendant + bleus} (pôle négatif). Cet axe capture donc les caractéristiques de texture de surface et d'odeur.
+\textbf{Interprétation} : Effet de taille (modalités rares éloignées du barycentre). Oppose champignons atypiques vs. "moyens". Moins discriminant pour la classe, utile pour identifier sous-groupes.
 
-\textbf{Lien avec la classe} : Les modalités du pôle positif (\texttt{odor\_\_f}, etc.) sont majoritairement associées aux champignons vénéneux (cf. Tableau~\ref{tab:odor_class}), suggérant que cet axe a un pouvoir discriminant.
-
-\subsubsection{Axe 2 (6,91\%) : <<~Modalités rares et attachement des lamelles~>>}
-
-Le Tableau~\ref{tab:contrib_dim2} présente les modalités contribuant le plus à l'axe 2.
-
-\begin{table}[H]
-\centering
-\caption{Top 10 des contributions à l'axe 2}
-\label{tab:contrib_dim2}
-\small
-\begin{tabular}{lrr}
-\toprule
-\textbf{Modalité} & \textbf{Coordonnée} & \textbf{Contribution (\%)} \\
-\midrule
-gill-attachment\_\_a (attached)          & 4,675 & 8,70 \\
-stalk-color-below-ring\_\_o (orange)     & 4,434 & 7,16 \\
-stalk-color-above-ring\_\_o (orange)     & 4,434 & 7,16 \\
-habitat\_\_l (leaves)                    & 1,692 & 4,52 \\
-population\_\_c (clustered)              & 2,625 & 4,44 \\
-gill-color\_\_y (yellow)                 & 5,175 & 4,37 \\
-veil-color\_\_n (brown)                  & 4,435 & 3,58 \\
-veil-color\_\_o (orange)                 & 4,434 & 3,58 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\textbf{Interprétation} :
-
-L'axe 2 est dominé par des \textbf{modalités rares} (e.g., \texttt{gill-attachment\_\_a} : 3\% des individus, \texttt{stalk-color-*\_\_o} : <1\%). Ces modalités ont des coordonnées très élevées car elles sont éloignées du centre de gravité.
-
-\textbf{Sens de l'axe} : L'axe 2 oppose les champignons présentant des caractéristiques atypiques (lamelles attachées, couleurs orange/jaune, habitat spécifique) aux champignons <<~moyens~>> (modalités fréquentes).
-
-\textbf{Limite} : Cet axe reflète principalement des \textbf{effets de taille} (modalités rares vs. fréquentes) plutôt qu'une opposition sémantique forte. Cependant, il capture une partie de la variabilité intra-espèces et peut être utile pour identifier des sous-groupes spécifiques.
-
-\subsubsection{Axes 3 à 5 : compléments d'information}
-
-Les axes 3 à 5 (non détaillés ici) capturent des nuances supplémentaires :
-\begin{itemize}
-    \item \textbf{Axe 3} : Variations de couleur du chapeau et de la tige
-    \item \textbf{Axe 4} : Opposition entre habitats (bois vs. prairies)
-    \item \textbf{Axe 5} : Forme du pied (élargissement vs. effilé)
-\end{itemize}
-
-Ces axes seront utilisés dans le clustering et l'analyse discriminante mais ne seront pas interprétés exhaustivement dans ce rapport.
-
-\subsection{Projections et visualisations}
-
-\subsubsection{Plan factoriel des modalités (axes 1-2)}
-
-La Figure~\ref{fig:modalities_plan} projette les 111 modalités sur le plan factoriel 1-2.
+\subsection{Visualisations}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{../reports/figures/acm_modalities_12.png}
+\includegraphics[width=0.9\textwidth]{../reports/figures/acm_modalities_12.png}
 \caption{Plan factoriel des modalités (axes 1-2)}
-\label{fig:modalities_plan}
+\label{fig:modalities}
 \end{figure}
-
-\textbf{Observations} :
-\begin{itemize}
-    \item \textbf{Dispersion sur l'axe 1} : Opposition entre modalités à gauche (\texttt{odor\_\_n}, \texttt{ring-type\_\_p}) et à droite (\texttt{odor\_\_f}, \texttt{ring-type\_\_l})
-    \item \textbf{Modalités excentrées sur l'axe 2} : Les modalités rares (\texttt{gill-attachment\_\_a}, \texttt{gill-color\_\_y}) sont très éloignées du centre
-    \item \textbf{Centre de gravité} : Les modalités fréquentes (e.g., \texttt{gill-attachment\_\_f}, \texttt{cap-shape\_\_x}) sont proches de l'origine
-\end{itemize}
-
-\subsubsection{Plan factoriel des individus (axes 1-2)}
-
-La Figure~\ref{fig:individuals_plan} projette les 8~124 individus (champignons) sur le plan 1-2, colorés selon leur classe (comestible/vénéneux).
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.9\textwidth]{../reports/figures/acm_individuals_12_color_target.png}
 \caption{Plan factoriel des individus (axes 1-2), colorés par classe}
-\label{fig:individuals_plan}
+\label{fig:individuals}
 \end{figure}
 
-\textbf{Analyse} :
-\begin{itemize}
-    \item \textbf{Séparation partielle} : On observe une tendance à la séparation entre comestibles (vert) et vénéneux (rouge) le long de l'axe 1, cohérente avec l'interprétation (odeur, anneau)
-    \item \textbf{Superposition} : Les nuages se chevauchent fortement, indiquant que les axes 1-2 seuls ne suffisent pas pour une discrimination parfaite
-    \item \textbf{Axes 3-5} : L'utilisation des 5 premiers axes (31,27\% d'inertie) devrait améliorer la séparation (à vérifier dans l'analyse discriminante, Section~6)
-\end{itemize}
+\textbf{Observation} (Fig.~\ref{fig:individuals}) : Séparation partielle edible/poisonous sur l'axe 1, nuages se chevauchent. Les 5 axes (31,3\% inertie) amélioreront la discrimination (sections 4-5).
 
-\subsection{Export des coordonnées et bilan}
+\subsection{Export}
 
-Les coordonnées des 8~124 individus sur les 10 premiers axes factoriels ont été exportées dans le fichier \texttt{mca\_coords.csv} (disponible avec le rapport). Ce fichier servira d'entrée pour :
-\begin{itemize}
-    \item La classification non supervisée (Section~5) : clustering sur les k = 5 premières colonnes
-    \item L'analyse discriminante (Section~6) : modélisation supervisée sur les mêmes 5 axes
-\end{itemize}
-
-\textbf{Bilan de l'ACM} :
-\begin{itemize}
-    \item \textbf{Réduction de dimensionnalité} : De 22 variables (111 modalités) à 5 axes factoriels interprétables
-    \item \textbf{Structure révélée} : Deux axes principaux capturant respectivement les caractéristiques de surface/odeur (axe 1) et les modalités rares (axe 2)
-    \item \textbf{Pouvoir discriminant} : L'axe 1 montre une séparation partielle entre classes, prometteur pour la suite
-    \item \textbf{Limite} : L'inertie expliquée reste modérée (31,27\%), typique en ACM avec de nombreuses variables
-\end{itemize}
-
-Les Sections~5 et 6 (réalisées par Personne B) exploiteront ces coordonnées factorielles pour (i) découvrir des groupes naturels de champignons et (ii) construire un modèle prédictif de la comestibilité.
+Fichiers générés : \texttt{mca\_coords.csv} (8~124 $\times$ 10 coordonnées), \texttt{mca\_eigenvalues.csv}, figures. Recommandation : utiliser k=5 axes pour clustering et analyse discriminante.
 
 % ==============================================================================
-% PLACEHOLDER POUR SECTIONS 5-6 (PERSONNE B)
+% PLACEHOLDER SECTIONS 4-5 (PERSONNE B)
 % ==============================================================================
-\section{Classification non supervisée sur composantes ACM}
-\textit{[Cette section sera rédigée par Personne B]}
+\section{Clustering sur composantes ACM}
+\textit{[Section rédigée par Personne B]}
 
-% ...
+\subsection{Méthode}
+CAH et K-means sur coordonnées factorielles (k=5 axes).
 
-\section{Analyse discriminante sur composantes ACM}
-\textit{[Cette section sera rédigée par Personne B]}
+\subsection{Résultats}
+\textit{[Choix nombre de clusters, dendrogramme, profils]}
 
-% ...
+\section{Analyse discriminante}
+\textit{[Section rédigée par Personne B]}
+
+\subsection{Modèle}
+LDA sur composantes ACM.
+
+\subsection{Performance}
+\textit{[Matrice de confusion, taux de succès, validation croisée]}
 
 % ==============================================================================
-% 7. CONCLUSION
+% CONCLUSION
 % ==============================================================================
 \section{Conclusion}
 
-\textit{[À compléter après intégration des sections 5-6]}
+L'ACM a révélé que les caractéristiques de surface et d'odeur constituent les axes principaux de variation (31,3\% d'inertie sur 5 axes). La variable \texttt{odor} présente une association quasi-parfaite avec la classe edible/poisonous, confirmée par l'axe 1. \textit{[À compléter avec résultats clustering et discriminante]}.
 
-Cette étude a permis d'analyser de manière approfondie le dataset UCI Mushroom à travers une démarche structurée combinant exploration (ACM, clustering) et prédiction (analyse discriminante).
+\textbf{Limites} : Inertie expliquée modérée (typique ACM), certaines modalités rares génèrent des effets de taille.
 
-\textbf{Principaux résultats} :
-\begin{itemize}
-    \item L'ACM a révélé deux axes majeurs : (1) caractéristiques de surface et odeur, (2) modalités rares
-    \item [À compléter : résultats clustering]
-    \item [À compléter : Performance discriminante, taux de classification]
-\end{itemize}
-
-\textbf{Apports de l'analyse} :
-\begin{itemize}
-    \item Identification des variables morphologiques discriminantes pour la comestibilité
-    \item Compréhension de la structure latente des profils de champignons
-    \item [À compléter]
-\end{itemize}
-
-\textbf{Limites} :
-\begin{itemize}
-    \item L'inertie expliquée par l'ACM reste modérée (31\% sur 5 axes)
-    \item Certaines modalités très rares génèrent des effets de taille sur l'axe 2
-    \item Le dataset ne couvre que des champignons à lamelles (non généralisable à toutes les espèces)
-\end{itemize}
-
-\textbf{Perspectives} :
-\begin{itemize}
-    \item Tester d'autres méthodes de réduction (FAMD si variables mixtes, t-SNE pour visualisation)
-    \item Comparer l'approche DISQUAL avec d'autres classifieurs (Random Forest, SVM)
-    \item Étendre l'analyse à d'autres datasets mycologiques
-\end{itemize}
+\textbf{Perspectives} : Comparer avec Random Forest, tester sur autres datasets mycologiques.
 
 % ==============================================================================
 % BIBLIOGRAPHIE
@@ -666,91 +294,17 @@ Cette étude a permis d'analyser de manière approfondie le dataset UCI Mushroom
 \begin{thebibliography}{9}
 
 \bibitem{uci}
-Dua, D. and Graff, C. (2019). \textit{UCI Machine Learning Repository}. Irvine, CA: University of California, School of Information and Computer Science. \url{http://archive.ics.uci.edu/ml}
+Dua, D. and Graff, C. (2019). \textit{UCI Machine Learning Repository}. \url{http://archive.ics.uci.edu/ml}
 
 \bibitem{audubon}
-Lincoff, G. H. (1981). \textit{The Audubon Society Field Guide to North American Mushrooms}. Alfred A. Knopf, New York.
+Lincoff, G. H. (1981). \textit{The Audubon Society Field Guide to North American Mushrooms}. Alfred A. Knopf.
 
 \bibitem{lebart}
-Lebart, L., Morineau, A., et Piron, M. (2006). \textit{Statistique exploratoire multidimensionnelle}. 4e édition, Dunod.
+Lebart, L., Morineau, A., et Piron, M. (2006). \textit{Statistique exploratoire multidimensionnelle}. Dunod.
 
 \bibitem{pages}
 Pagès, J. (2014). \textit{Multiple Factor Analysis by Example Using R}. Chapman \& Hall/CRC.
 
-\bibitem{saporta}
-Saporta, G. (2011). \textit{Probabilités, analyse des données et statistique}. 3e édition, Éditions Technip.
-
 \end{thebibliography}
-
-% ==============================================================================
-% ANNEXES
-% ==============================================================================
-\newpage
-\appendix
-
-\section{Dictionnaire complet des variables}
-\label{annexe:dict}
-
-\small
-\begin{longtable}{p{3.8cm}p{10.5cm}}
-\caption{Dictionnaire exhaustif des 23 variables} \\
-\toprule
-\textbf{Variable} & \textbf{Description et modalités} \\
-\midrule
-\endfirsthead
-
-\multicolumn{2}{c}{\textit{(suite)}} \\
-\toprule
-\textbf{Variable} & \textbf{Description et modalités} \\
-\midrule
-\endhead
-
-\midrule
-\multicolumn{2}{r}{\textit{(suite page suivante)}} \\
-\endfoot
-
-\bottomrule
-\endlastfoot
-
-\texttt{class} & Classe : \texttt{e} = edible (comestible), \texttt{p} = poisonous (vénéneux) \\
-\texttt{cap-shape} & Forme du chapeau : \texttt{b} = bell, \texttt{c} = conical, \texttt{x} = convex, \texttt{f} = flat, \texttt{k} = knobbed, \texttt{s} = sunken \\
-\texttt{cap-surface} & Surface du chapeau : \texttt{f} = fibrous, \texttt{g} = grooves, \texttt{y} = scaly, \texttt{s} = smooth \\
-\texttt{cap-color} & Couleur du chapeau : \texttt{n} = brown, \texttt{b} = buff, \texttt{c} = cinnamon, \texttt{g} = gray, \texttt{r} = green, \texttt{p} = pink, \texttt{u} = purple, \texttt{e} = red, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{bruises} & Présence de bleus : \texttt{t} = bruises, \texttt{f} = no bruises \\
-\texttt{odor} & Odeur : \texttt{a} = almond, \texttt{l} = anise, \texttt{c} = creosote, \texttt{y} = fishy, \texttt{f} = foul, \texttt{m} = musty, \texttt{n} = none, \texttt{p} = pungent, \texttt{s} = spicy \\
-\texttt{gill-attachment} & Attachement des lamelles : \texttt{a} = attached, \texttt{d} = descending, \texttt{f} = free, \texttt{n} = notched \\
-\texttt{gill-spacing} & Espacement des lamelles : \texttt{c} = close, \texttt{w} = crowded, \texttt{d} = distant \\
-\texttt{gill-size} & Taille des lamelles : \texttt{b} = broad, \texttt{n} = narrow \\
-\texttt{gill-color} & Couleur des lamelles : \texttt{k} = black, \texttt{n} = brown, \texttt{b} = buff, \texttt{h} = chocolate, \texttt{g} = gray, \texttt{r} = green, \texttt{o} = orange, \texttt{p} = pink, \texttt{u} = purple, \texttt{e} = red, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{stalk-shape} & Forme du pied : \texttt{e} = enlarging, \texttt{t} = tapering \\
-\texttt{stalk-root} & Racine du pied : \texttt{b} = bulbous, \texttt{c} = club, \texttt{u} = cup, \texttt{e} = equal, \texttt{z} = rhizomorphs, \texttt{r} = rooted, \texttt{?} = missing \\
-\texttt{stalk-surface-} \texttt{above-ring} & Surface pied au-dessus anneau : \texttt{f} = fibrous, \texttt{y} = scaly, \texttt{k} = silky, \texttt{s} = smooth \\
-\texttt{stalk-surface-} \texttt{below-ring} & Surface pied en-dessous anneau : \texttt{f} = fibrous, \texttt{y} = scaly, \texttt{k} = silky, \texttt{s} = smooth \\
-\texttt{stalk-color-} \texttt{above-ring} & Couleur pied au-dessus anneau : \texttt{n} = brown, \texttt{b} = buff, \texttt{c} = cinnamon, \texttt{g} = gray, \texttt{o} = orange, \texttt{p} = pink, \texttt{e} = red, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{stalk-color-} \texttt{below-ring} & Couleur pied en-dessous anneau : \texttt{n} = brown, \texttt{b} = buff, \texttt{c} = cinnamon, \texttt{g} = gray, \texttt{o} = orange, \texttt{p} = pink, \texttt{e} = red, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{veil-type} & Type de voile : \texttt{p} = partial, \texttt{u} = universal \\
-\texttt{veil-color} & Couleur du voile : \texttt{n} = brown, \texttt{o} = orange, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{ring-number} & Nombre d'anneaux : \texttt{n} = none, \texttt{o} = one, \texttt{t} = two \\
-\texttt{ring-type} & Type d'anneau : \texttt{c} = cobwebby, \texttt{e} = evanescent, \texttt{f} = flaring, \texttt{l} = large, \texttt{n} = none, \texttt{p} = pendant, \texttt{s} = sheathing, \texttt{z} = zone \\
-\texttt{spore-print-color} & Couleur empreinte spores : \texttt{k} = black, \texttt{n} = brown, \texttt{b} = buff, \texttt{h} = chocolate, \texttt{r} = green, \texttt{o} = orange, \texttt{u} = purple, \texttt{w} = white, \texttt{y} = yellow \\
-\texttt{population} & Population : \texttt{a} = abundant, \texttt{c} = clustered, \texttt{n} = numerous, \texttt{s} = scattered, \texttt{v} = several, \texttt{y} = solitary \\
-\texttt{habitat} & Habitat : \texttt{g} = grasses, \texttt{l} = leaves, \texttt{m} = meadows, \texttt{p} = paths, \texttt{u} = urban, \texttt{w} = waste, \texttt{d} = woods \\
-
-\end{longtable}
-
-\section{Tableaux de contributions et cos² complets}
-\label{annexe:contrib}
-
-\textit{[Tableaux détaillés des contributions des modalités aux axes 1 à 5, et qualités de représentation]}
-
-\section{Détails des résultats de clustering}
-\label{annexe:cluster}
-
-\textit{[Sera complété par Personne B : tableaux de profils complets, v-tests, etc.]}
-
-\section{Détails des résultats de l'analyse discriminante}
-\label{annexe:discr}
-
-\textit{[Sera complété par Personne B : coefficients, résultats de validation croisée détaillés, etc.]}
 
 \end{document}
