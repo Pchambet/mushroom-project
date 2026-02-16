@@ -43,9 +43,6 @@ jobs:
           python src/04_cluster.py
           python src/05_discriminant.py
 
-      - name: Validate interface
-        run: python src/validate_interface.py
-
       - name: Run extended analysis (06-07)
         run: |
           python src/06_sensitivity.py

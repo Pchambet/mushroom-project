@@ -148,7 +148,6 @@ make run-all       # Pipeline complet (scripts 00 a 07)
 make run-A         # Download → Prepare → Describe → ACM
 make run-B         # Clustering → Discriminante
 make run-extended  # Sensibilite + Comparaison modeles
-make validate      # Valider le contrat d'interface
 make dashboard     # Lancer le dashboard Streamlit
 make clean         # Supprimer tous les outputs generes
 make distclean     # Nettoyage complet (outputs + venv)
@@ -163,7 +162,7 @@ make help          # Afficher l'aide
 
 ```
 mushroom-project/
-├── src/                              # Pipeline (10 scripts)
+├── src/                              # Pipeline (9 scripts)
 │   ├── 00_download.py                #   Acquisition UCI
 │   ├── 01_prepare.py                 #   Nettoyage
 │   ├── 02_describe.py                #   Stats descriptives
@@ -172,13 +171,12 @@ mushroom-project/
 │   ├── 05_discriminant.py            #   LDA
 │   ├── 06_sensitivity.py             #   Sensibilite (impact de k)
 │   ├── 07_model_comparison.py        #   LDA vs RF vs SVM vs LogReg
-│   ├── utils.py                      #   Helpers
-│   └── validate_interface.py         #   Validation
+│   └── utils.py                      #   Helpers
 ├── app.py                            # Dashboard Streamlit
 ├── reports/figures/                   # 16 figures (300 DPI)
 ├── reports/tables/                    # 12 tables CSV
 ├── data/                              # Raw + processed
-├── docs/                              # Audit, dictionnaire, specs
+├── docs/                              # Audit, dictionnaire
 ├── .github/workflows/pipeline.yml     # CI (Python 3.10 + 3.11)
 ├── Makefile                           # Orchestration
 └── requirements.txt                   # Dependances
@@ -192,8 +190,6 @@ mushroom-project/
 |---|---|
 | [`docs/AUDIT_COMPLET.md`](docs/AUDIT_COMPLET.md) | **Audit approfondi** — synergie, architecture, resultats, qualite |
 | [`docs/data_dictionary.md`](docs/data_dictionary.md) | Dictionnaire des 23 variables et modalites |
-| [`docs/INTERFACE_SPEC.md`](docs/INTERFACE_SPEC.md) | Contrat d'interface (`mca_coords.csv`) |
-| [`docs/FAQ.md`](docs/FAQ.md) | Questions frequentes |
 
 ---
 

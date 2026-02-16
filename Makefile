@@ -8,7 +8,7 @@ PIP     := ./venv/bin/pip
 SRC     := src
 VENV    := venv
 
-.PHONY: help install run-all run-A run-B run-extended validate dashboard clean distclean
+.PHONY: help install run-all run-extended dashboard clean distclean
 
 # ── Aide ────────────────────────────────────────────────────
 
@@ -46,22 +46,6 @@ run-all: ## Exécuter l'intégralité du pipeline (00 → 07)
 	@echo ""
 	@echo "✓ Pipeline complet terminé."
 
-run-A: ## Exécuter les missions A (00 → 03 : Download, Prepare, Describe, ACM)
-	@echo "═══ Missions A ═══"
-	$(PYTHON) $(SRC)/00_download.py
-	$(PYTHON) $(SRC)/01_prepare.py
-	$(PYTHON) $(SRC)/02_describe.py
-	$(PYTHON) $(SRC)/03_mca.py
-	@echo ""
-	@echo "✓ Missions A terminées. Fichier interface : data/processed/mca_coords.csv"
-
-run-B: ## Exécuter les missions B (04 → 05 : Clustering, Discriminante)
-	@echo "═══ Missions B ═══"
-	$(PYTHON) $(SRC)/04_cluster.py
-	$(PYTHON) $(SRC)/05_discriminant.py
-	@echo ""
-	@echo "✓ Missions B terminées."
-
 run-extended: ## Exécuter les analyses étendues (06 → 07 : Sensibilité, Comparaison)
 	@echo "═══ Analyses étendues ═══"
 	$(PYTHON) $(SRC)/06_sensitivity.py
@@ -73,12 +57,6 @@ run-extended: ## Exécuter les analyses étendues (06 → 07 : Sensibilité, Com
 
 dashboard: ## Lancer le dashboard Streamlit interactif
 	$(VENV)/bin/streamlit run app.py
-
-# ── Validation ─────────────────────────────────────────────
-
-validate: ## Valider le contrat d'interface A → B
-	@echo "═══ Validation de l'interface ═══"
-	$(PYTHON) $(SRC)/validate_interface.py
 
 # ── Nettoyage ──────────────────────────────────────────────
 
