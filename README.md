@@ -1,92 +1,123 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn">
-  <img src="https://img.shields.io/badge/pandas-2.0+-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="pandas">
-  <a href="https://pchambet-mushroom-project.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit Dashboard"></a>
+  <a href="https://pchambet-mushroom-project.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Dashboard"></a>
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
 
 <h1 align="center">The Mushroom Project</h1>
 
 <p align="center">
-  <strong>Pipeline d'analyse statistique sur donnees categorielles</strong><br>
-  <em>De la reduction dimensionnelle (ACM) au clustering et a la classification</em>
+  <em>8 124 champignons. 22 descripteurs. Une question de vie ou de mort.</em>
 </p>
 
 ---
 
-## Identite du projet
+Un champignon devant vous. Chapeau convexe, odeur anisee, lamelles libres, anneau pendant.
 
-The Mushroom Project resout un probleme fondamental : **comment appliquer des outils statistiques classiques (K-Means, LDA) a des donnees purement categoriques ?**
+**Comestible ou mortel ?**
 
-22 variables nominales decrivent la morphologie de 8 124 champignons — forme du chapeau, odeur, couleur des lamelles, type d'anneau. Aucune n'est numerique. L'**Analyse en Composantes Multiples (ACM)** est le pont mathematique qui rend tout le reste possible :
+Un mycologue experimente croise ces indices mentalement, en une seconde. Mais comment faire comprendre ca a une machine ? Parce que le vrai probleme, ce n'est pas la classification. C'est que **toutes ces informations sont des mots**. Pas un seul chiffre. Et les algorithmes de machine learning ne parlent que le langage des nombres.
 
-```
-22 variables categorielles    →    ACM    →    Espace euclidien continu    →    Modeles
-   (8 124 champignons)          10 axes        Distances exploitables         K-Means + LDA
-                                               Visualisation possible         RF + SVM
-```
+Alors comment transformer des mots en geometrie ?
 
 ---
 
-## Resultats
+## Le pont
 
-### ACM — Les champignons dans l'espace factoriel
+L'**Analyse en Composantes Multiples** (ACM) est la reponse.
 
-L'ACM projette les 8 124 specimens dans un espace continu. Sur les deux premiers axes, on voit deja une **separation nette** entre comestibles (vert) et venéneux (rouge) :
+Elle prend 22 variables categorielles — des descriptions textuelles comme "odeur = anis" ou "chapeau = convexe" — et les projette dans un **espace euclidien continu**. Soudain, chaque champignon a des coordonnees. Des distances. Une position dans un espace ou les mathematiques peuvent operer.
+
+```
+22 variables categorielles    →    ACM    →    Espace continu    →    Modeles
+  (forme, odeur, couleur...)       10 axes      Coordonnees reelles     K-Means, LDA, RF, SVM
+```
+
+C'est ce pont qui rend tout le reste possible.
+
+Et ce qui emerge dans cet espace est remarquable.
+
+---
+
+## Ce qui se passe quand on projette
+
+Des qu'on place les 8 124 champignons sur les deux premiers axes de l'ACM, quelque chose saute aux yeux :
 
 <p align="center">
   <img src="reports/figures/acm_individuals_12_color_target.png" width="700" alt="ACM - Individus colores par classe">
 </p>
 
-Le scree plot montre la repartition de l'inertie sur les 10 axes. Pas de coude franc — typique des donnees categoriques. 90% d'inertie cumulee a 8 axes.
+Les comestibles (vert) et les veneneux (rouge) **se separent naturellement**. Personne n'a demande a l'algorithme de les trier — l'ACM ne connait meme pas les etiquettes. Elle a juste trouve la structure geometrique cachee dans les descriptions morphologiques.
+
+Le scree plot montre comment l'information se repartit sur les 10 axes. Pas de coude franc — c'est typique des donnees categoriques. 90% d'inertie cumulee a 8 axes.
 
 <p align="center">
   <img src="reports/figures/acm_scree.png" width="700" alt="Scree plot ACM">
 </p>
 
-### Clustering — Structures naturelles
+La question qui suit naturellement : est-ce que cette structure est assez forte pour faire emerger des groupes ?
 
-Le dendrogramme (CAH Ward) guide le choix de 3 clusters. Le K-Means revele un **cluster 100% comestible** et un **cluster 98.2% venéneux** :
+---
+
+## Des groupes apparaissent sans qu'on les demande
+
+Le clustering (CAH Ward + K-Means) dans l'espace ACM revele **3 groupes naturels** :
 
 <p align="center">
   <img src="reports/figures/cluster_on_acm12.png" width="48%" alt="Clusters sur plan ACM">
   <img src="reports/figures/cluster_dendrogram.png" width="48%" alt="Dendrogramme">
 </p>
 
-| Cluster | Taille | Comestibles | Venéneux | Purete |
-|---|---|---|---|---|
-| **0** | 4 824 (59.4%) | 3 961 | 863 | Mixte (82% e) |
-| **1** | 192 (2.4%) | 192 | 0 | **100% comestible** |
-| **2** | 3 108 (38.3%) | 55 | 3 053 | **98.2% venéneux** |
+| Cluster | Taille | Composition | Purete |
+|---|---|---|---|
+| **0** | 4 824 (59.4%) | 82% comestible | Mixte |
+| **1** | 192 (2.4%) | 100% comestible | **Pur** |
+| **2** | 3 108 (38.3%) | 98.2% veneneux | **Quasi pur** |
 
-### Classification — LDA et validation croisee
+Un cluster entierement comestible. Un autre presque entierement mortel. **Sans supervision.** Juste la geometrie des descriptions.
 
-L'analyse discriminante lineaire sur les 5 premiers axes ACM : **88.7% d'accuracy**, avec un recall de 97.6% sur les comestibles. La matrice de confusion en validation croisee 5-fold :
+Alors si la structure est la... peut-on reellement predire ?
+
+---
+
+## La reponse a la question de depart
+
+L'analyse discriminante lineaire (LDA) sur les 5 premiers axes ACM :
 
 <p align="center">
-  <img src="reports/figures/da_confusion_cv.png" width="45%" alt="Confusion matrix CV">
-  <img src="reports/figures/da_cv_scores.png" width="50%" alt="CV scores par fold">
+  <img src="reports/figures/da_confusion_cv.png" width="45%" alt="Matrice de confusion CV">
+  <img src="reports/figures/da_cv_scores.png" width="50%" alt="Scores CV par fold">
 </p>
 
 | Metrique | Valeur |
 |---|---|
 | Accuracy (train) | **88.7%** |
-| Precision venéneux | **96.8%** |
+| Precision veneneux | **96.8%** |
 | Recall comestible | **97.6%** |
 | CV 5-fold | **77.1% +/- 14.0%** |
 
-### Analyse de sensibilite — Pourquoi k=4 et pas k=8 ?
+Quand le modele dit "mange-le", il a raison 97.6% du temps.
 
-L'ajout de dimensions ACM ne garantit pas de meilleures performances. **k=4 axes donne la meilleure accuracy CV (88.9%)**, mieux que k=5 (77.1%) ou k=8 (80.0%) :
+Mais deux questions restent ouvertes. **Combien d'axes ACM faut-il vraiment ?** Et **LDA est-il le meilleur modele sur cet espace ?**
+
+---
+
+## Plus de dimensions = meilleur ?
+
+Non.
+
+L'analyse de sensibilite teste k = 2 a 10 axes ACM. Resultat contre-intuitif : **k=4 donne la meilleure accuracy CV (88.9%)**, mieux que k=5 (77.1%) ou k=8 (80.0%). Ajouter du bruit dimensionnel degrade les performances.
 
 <p align="center">
   <img src="reports/figures/sensitivity_k_analysis.png" width="700" alt="Analyse de sensibilite">
 </p>
 
-### Comparaison de modeles — LDA vs Random Forest vs SVM vs LogReg
+---
 
-4 classifieurs sur les memes coordonnees ACM. Random Forest domine en accuracy, mais avec un **overfitting massif** (99.9% train vs 85.3% CV) :
+## Et si on changeait de modele ?
+
+Quatre classifieurs sur les memes coordonnees ACM. Random Forest domine en accuracy brute — mais regardez l'ecart train/CV :
 
 <p align="center">
   <img src="reports/figures/model_comparison.png" width="700" alt="Comparaison de modeles">
@@ -103,28 +134,30 @@ L'ajout de dimensions ACM ne garantit pas de meilleures performances. **k=4 axes
 | LDA | 88.7% | 77.1% | 0.771 |
 | Logistic Regression | 88.6% | 74.7% | 0.747 |
 
+99.9% en train, 85.3% en CV — c'est de l'**overfitting**. LDA, avec son ecart train/CV plus contenu, reste le modele le plus honnete. Le choix entre performance brute et fiabilite est un vrai sujet.
+
 ---
 
-## Dashboard Interactif
+## Explorer par vous-meme
 
-Le projet inclut un **dashboard Streamlit** pour explorer les resultats de maniere interactive — graphiques Plotly, sliders pour ajuster les parametres, navigation entre les analyses.
+Tout ce qui precede est interactif. Le dashboard permet de manipuler les axes, ajuster les clusters, comparer les modeles — en temps reel.
 
-> **[Essayer en ligne](https://pchambet-mushroom-project.streamlit.app/)** — graphiques interactifs, sliders, exploration libre. Aucune installation requise.
+> **[Ouvrir le dashboard](https://pchambet-mushroom-project.streamlit.app/)** — aucune installation requise.
 
 <p align="center">
-  <img src="reports/figures/dashboard_overview.png" width="100%" alt="Dashboard - Vue d'ensemble">
+  <img src="reports/figures/dashboard_overview.png" width="100%" alt="Dashboard">
 </p>
 
 <details>
-<summary><strong>Pages du dashboard</strong></summary>
+<summary><strong>Apercu des pages</strong></summary>
 
-**Espace ACM** — Projection interactive des individus, choix des axes et de la coloration :
+**Espace ACM** — choisir les axes, colorer par classe ou par cluster :
 
 <p align="center">
   <img src="reports/figures/dashboard_acm.png" width="100%" alt="Dashboard - Espace ACM">
 </p>
 
-**Clustering** — Ajustement du nombre de clusters et d'axes ACM en temps reel :
+**Clustering** — ajuster le nombre de clusters et d'axes en temps reel :
 
 <p align="center">
   <img src="reports/figures/dashboard_clustering.png" width="100%" alt="Dashboard - Clustering">
@@ -134,31 +167,7 @@ Le projet inclut un **dashboard Streamlit** pour explorer les resultats de manie
 
 ---
 
-## Methodologie
-
-```mermaid
-graph LR
-    A[Dataset brut<br/>8 124 x 23] -->|Nettoyage<br/>Imputation| B[Dataset prepare]
-    B -->|ACM prince| C[Espace factoriel<br/>10 dimensions]
-    C -->|k axes| D[Clustering<br/>CAH Ward + K-Means]
-    C -->|k axes| E[Classification<br/>LDA / RF / SVM]
-    D --> F[3 clusters<br/>interpretes]
-    E --> G[Metriques<br/>+ Matrice confusion]
-    C -->|k=2..10| H[Analyse sensibilite]
-
-    style A fill:#e8f4f8,stroke:#2196F3
-    style B fill:#e8f4f8,stroke:#2196F3
-    style C fill:#fff3e0,stroke:#FF9800
-    style D fill:#f3e5f5,stroke:#9C27B0
-    style E fill:#f3e5f5,stroke:#9C27B0
-    style F fill:#e8f5e9,stroke:#4CAF50
-    style G fill:#e8f5e9,stroke:#4CAF50
-    style H fill:#fce4ec,stroke:#E91E63
-```
-
----
-
-## Demarrage rapide
+## Reproduire
 
 ```bash
 git clone https://github.com/Pchambet/mushroom-project.git
@@ -166,22 +175,22 @@ cd mushroom-project
 
 make install       # Environnement virtuel + dependances
 make run-all       # Pipeline complet (00 → 07)
-make dashboard     # Lancer le dashboard interactif
+make dashboard     # Dashboard en local
 ```
 
 <details>
 <summary><strong>Toutes les commandes</strong></summary>
 
 ```bash
-make install       # Creer l'environnement virtuel + installer les dependances
+make install       # Creer l'environnement + dependances
 make run-all       # Pipeline complet (scripts 00 a 07)
 make run-A         # Download → Prepare → Describe → ACM
 make run-B         # Clustering → Discriminante
 make run-extended  # Sensibilite + Comparaison modeles
 make dashboard     # Lancer le dashboard Streamlit
-make clean         # Supprimer tous les outputs generes
+make clean         # Supprimer les outputs
 make distclean     # Nettoyage complet (outputs + venv)
-make help          # Afficher l'aide
+make help          # Aide
 ```
 
 </details>
@@ -203,22 +212,21 @@ mushroom-project/
 │   ├── 07_model_comparison.py        #   LDA vs RF vs SVM vs LogReg
 │   └── utils.py                      #   Helpers
 ├── app.py                            # Dashboard Streamlit
-├── reports/figures/                   # 16 figures (300 DPI)
-├── reports/tables/                    # 12 tables CSV
+├── reports/figures/                   # Figures (300 DPI)
+├── reports/tables/                    # Tables CSV
 ├── data/                              # Raw + processed
 ├── docs/                              # Audit, dictionnaire
-├── .github/workflows/pipeline.yml     # CI (Python 3.10 + 3.11)
 ├── Makefile                           # Orchestration
 └── requirements.txt                   # Dependances
 ```
 
 ---
 
-## Documentation
+## En profondeur
 
 | Document | Description |
 |---|---|
-| [`docs/AUDIT_COMPLET.md`](docs/AUDIT_COMPLET.md) | **Audit approfondi** — synergie, architecture, resultats, qualite |
+| [`docs/AUDIT_COMPLET.md`](docs/AUDIT_COMPLET.md) | **Audit detaille** — synergie, architecture, resultats, qualite |
 | [`docs/data_dictionary.md`](docs/data_dictionary.md) | Dictionnaire des 23 variables et modalites |
 
 ---
