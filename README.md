@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn">
   <img src="https://img.shields.io/badge/pandas-2.0+-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="pandas">
-  <img src="https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
+  <a href="https://pchambet-mushroom-project.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit Dashboard"></a>
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
 
@@ -109,7 +109,7 @@ L'ajout de dimensions ACM ne garantit pas de meilleures performances. **k=4 axes
 
 Le projet inclut un **dashboard Streamlit** pour explorer les resultats de maniere interactive — graphiques Plotly, sliders pour ajuster les parametres, navigation entre les analyses.
 
-> **Essayer en ligne** : `streamlit run app.py` apres installation, ou deployer sur [Streamlit Community Cloud](https://share.streamlit.io) (gratuit).
+> **[Essayer en ligne](https://pchambet-mushroom-project.streamlit.app/)** — graphiques interactifs, sliders, exploration libre. Aucune installation requise.
 
 <p align="center">
   <img src="reports/figures/dashboard_overview.png" width="100%" alt="Dashboard - Vue d'ensemble">
