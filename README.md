@@ -2,6 +2,7 @@
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn">
   <img src="https://img.shields.io/badge/pandas-2.0+-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="pandas">
+  <img src="https://img.shields.io/badge/Streamlit-Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
 
@@ -101,6 +102,35 @@ L'ajout de dimensions ACM ne garantit pas de meilleures performances. **k=4 axes
 | SVM (RBF) | 96.3% | 82.6% | 0.826 |
 | LDA | 88.7% | 77.1% | 0.771 |
 | Logistic Regression | 88.6% | 74.7% | 0.747 |
+
+---
+
+## Dashboard Interactif
+
+Le projet inclut un **dashboard Streamlit** pour explorer les resultats de maniere interactive — graphiques Plotly, sliders pour ajuster les parametres, navigation entre les analyses.
+
+> **Essayer en ligne** : `streamlit run app.py` apres installation, ou deployer sur [Streamlit Community Cloud](https://share.streamlit.io) (gratuit).
+
+<p align="center">
+  <img src="reports/figures/dashboard_overview.png" width="100%" alt="Dashboard - Vue d'ensemble">
+</p>
+
+<details>
+<summary><strong>Pages du dashboard</strong></summary>
+
+**Espace ACM** — Projection interactive des individus, choix des axes et de la coloration :
+
+<p align="center">
+  <img src="reports/figures/dashboard_acm.png" width="100%" alt="Dashboard - Espace ACM">
+</p>
+
+**Clustering** — Ajustement du nombre de clusters et d'axes ACM en temps reel :
+
+<p align="center">
+  <img src="reports/figures/dashboard_clustering.png" width="100%" alt="Dashboard - Clustering">
+</p>
+
+</details>
 
 ---
 
