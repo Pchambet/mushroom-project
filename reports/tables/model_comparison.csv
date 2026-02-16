@@ -1,0 +1,5 @@
+model,train_accuracy,cv_accuracy_mean,cv_accuracy_std,precision_poisonous,recall_poisonous,precision_edible,recall_edible,f1_macro,overfitting_gap
+Random Forest,0.9986,0.853,0.1686,0.8307,0.8731,0.876,0.8344,0.853,0.1457
+SVM (RBF),0.9631,0.8263,0.1422,0.8157,0.8264,0.8364,0.8263,0.8262,0.1368
+LDA,0.8871,0.7709,0.1398,0.7456,0.7965,0.7978,0.7471,0.7709,0.1162
+Logistic Regression,0.8864,0.7471,0.1609,0.7124,0.7975,0.788,0.7003,0.7471,0.1392

@@ -1,0 +1,30 @@
+# ──────────────────────────────────────────────
+# The Mushroom Project — Dépendances Python
+# Python >= 3.8 (recommandé : 3.11)
+# ──────────────────────────────────────────────
+
+# Data
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Statistics & ML
+scipy>=1.10.0
+scikit-learn>=1.3.0
+
+# Multiple Correspondence Analysis
+prince>=0.11.0
+
+# Jupyter (notebooks interactifs)
+jupyter>=1.0.0
+ipykernel>=6.0.0
+
+# Image handling (storyboard notebook)
+Pillow>=10.0.0
+
+# Dashboard interactif
+streamlit>=1.30.0
+plotly>=5.18.0
