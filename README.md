@@ -1,14 +1,12 @@
 <p align="center">
+  <img src="reports/figures/banner.jpg" width="100%" alt="The Mushroom Project">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/scikit--learn-1.3+-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="scikit-learn">
   <a href="https://pchambet-mushroom-project.streamlit.app/"><img src="https://img.shields.io/badge/Streamlit-Live_Dashboard-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Dashboard"></a>
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
-</p>
-
-<h1 align="center">The Mushroom Project</h1>
-
-<p align="center">
-  <em>8 124 champignons. 22 descripteurs. Une question de vie ou de mort.</em>
 </p>
 
 ---
