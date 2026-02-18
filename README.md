@@ -331,14 +331,6 @@ mushroom-project/
 
 ---
 
-## En profondeur
-
-| Document | Description |
-|---|---|
-| [`docs/data_dictionary.md`](docs/data_dictionary.md) | Dictionnaire des 23 variables et modalités |
-
----
-
 ## Stack
 
 | Composant | Librairie |
