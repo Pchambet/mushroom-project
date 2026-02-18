@@ -1,5 +1,5 @@
 """
-02 — Statistiques descriptives (Mission A2).
+02 — Statistiques descriptives.
 
 Génère les statistiques univariées, la distribution de la variable cible,
 et les visualisations des variables clés. Exporte les résultats dans
@@ -27,9 +27,9 @@ TARGET_COLORS = {"e": "#2ecc71", "p": "#e74c3c"}
 # ── Pipeline ───────────────────────────────────────────────
 
 def describe_data() -> None:
-    """Génère les statistiques descriptives du dataset (Mission A2)."""
+    """Génère les statistiques descriptives du dataset."""
 
-    print_section("02 — Statistiques descriptives (Mission A2)")
+    print_section("02 — Statistiques descriptives")
 
     df = load_processed_data()
     print_step(f"Dataset chargé : {df.shape[0]:,} x {df.shape[1]}")
@@ -121,7 +121,7 @@ def describe_data() -> None:
     # ── Résumé ──
 
     print()
-    print_step("Mission A2 terminée.")
+    print_step("Statistiques descriptives terminées.")
     print()
     print("  Outputs :")
     print("    Tables  — univariate_summary.csv, target_distribution.csv")

@@ -1,5 +1,5 @@
 """
-04 — Clustering sur coordonnées ACM (Mission B1).
+04 — Clustering sur coordonnées ACM.
 
 Effectue une Classification Ascendante Hiérarchique (Ward) pour guider
 le choix du nombre de clusters, puis consolide avec K-Means.
@@ -35,9 +35,9 @@ RANDOM_STATE = 42
 # ── Pipeline ───────────────────────────────────────────────
 
 def perform_clustering() -> None:
-    """Effectue le clustering sur les coordonnées ACM (Mission B1)."""
+    """Effectue le clustering sur les coordonnées ACM."""
 
-    print_section("04 — Clustering sur coordonnées ACM (Mission B1)")
+    print_section("04 — Clustering sur coordonnées ACM")
 
     # ── Chargement ──
 
@@ -157,7 +157,7 @@ def perform_clustering() -> None:
     # ── Résumé ──
 
     print()
-    print_step("Mission B1 terminée.")
+    print_step("Clustering terminé.")
     print()
     print("  Outputs :")
     print("    Tables  — cluster_sizes.csv, cluster_vs_target.csv, cluster_profiles.csv")

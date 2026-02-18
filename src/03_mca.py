@@ -1,9 +1,9 @@
 """
-03 — Analyse en Composantes Multiples (Mission A3).
+03 — Analyse en Composantes Multiples (ACM).
 
 Effectue l'ACM sur les 22 variables catégorielles, exporte les coordonnées
-factorielles (fichier interface ``mca_coords.csv`` pour Personne B), les
-valeurs propres, les contributions des modalités, et les visualisations.
+factorielles (``mca_coords.csv``), les valeurs propres, les contributions
+des modalités, et les visualisations.
 
 Librairie ACM : ``prince`` (https://github.com/MaxHalford/prince)
 """
@@ -32,13 +32,13 @@ TOP_CONTRIB = 15
 # ── Pipeline ───────────────────────────────────────────────
 
 def perform_mca() -> None:
-    """Effectue l'ACM sur le dataset (Mission A3).
+    """Effectue l'ACM sur le dataset.
 
-    Produit le fichier interface ``data/processed/mca_coords.csv``
-    contenant les coordonnées de chaque individu sur les axes factoriels.
+    Produit ``data/processed/mca_coords.csv`` contenant les coordonnées
+    de chaque individu sur les axes factoriels.
     """
 
-    print_section("03 — Analyse en Composantes Multiples (Mission A3)")
+    print_section("03 — Analyse en Composantes Multiples (ACM)")
 
     processed_dir = get_project_root() / "data" / "processed"
     processed_dir.mkdir(parents=True, exist_ok=True)
@@ -179,9 +179,9 @@ def perform_mca() -> None:
     # ── Résumé ──
 
     print()
-    print_step("Mission A3 terminée.")
+    print_step("ACM terminée.")
     print()
-    print("  Livraison pour Personne B :")
+    print("  Coordonnées factorielles :")
     print(f"    mca_coords.csv  ({row_coords.shape[0]:,} individus x {row_coords.shape[1]} axes)")
     print(f"    k recommandé    = {k_recommended} axes")
     print(f"    Inertie (k={k_recommended})  = {cumulative[k_recommended-1]*100:.1f}%")

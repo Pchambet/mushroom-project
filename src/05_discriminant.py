@@ -1,9 +1,9 @@
 """
-05 — Analyse discriminante linéaire (Mission B2).
+05 — Analyse discriminante linéaire (LDA).
 
-Effectue une LDA (Linear Discriminant Analysis) sur les coordonnées ACM
-pour la classification binaire comestible/vénéneux. Évalue le modèle par
-matrice de confusion et validation croisée 5-fold.
+Effectue une LDA sur les coordonnées ACM pour la classification binaire
+comestible/vénéneux. Évalue le modèle par matrice de confusion et
+validation croisée 5-fold.
 """
 
 from __future__ import annotations
@@ -33,9 +33,9 @@ TARGET_NAMES = ["Poisonous", "Edible"]
 # ── Pipeline ───────────────────────────────────────────────
 
 def perform_discriminant_analysis() -> None:
-    """Effectue l'analyse discriminante linéaire (Mission B2)."""
+    """Effectue l'analyse discriminante linéaire."""
 
-    print_section("05 — Analyse discriminante (Mission B2)")
+    print_section("05 — Analyse discriminante (LDA)")
 
     # ── Chargement ──
 
@@ -172,7 +172,7 @@ def perform_discriminant_analysis() -> None:
     # ── Résumé ──
 
     print()
-    print_step("Mission B2 terminée.")
+    print_step("Analyse discriminante terminée.")
     print()
     print("  Outputs :")
     print("    Tables  — da_metrics.csv, da_confusion.csv")
