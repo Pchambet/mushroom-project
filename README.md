@@ -22,6 +22,7 @@ Parce que le vrai problème, ce n'est pas la classification. C'est que **toutes 
 La vraie question de ce projet :
 
 > **Comment transformer des mots en géometrie pour prédire la toxicité ?**
+
 > **Comment extraire du sens calculable à partir de descriptions qualitatives ?**
 
 Pour y répondre, on suit une démarche en cinq temps. Chacun construit sur le précédent. Aucun ne peut être sauté.
