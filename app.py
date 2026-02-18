@@ -84,9 +84,15 @@ def load_tables():
 
 # ── Chargement sécurisé ──────────────────────────────────────
 
-# Si les données n'existent pas (ex. Streamlit Cloud), exécuter le pipeline
-if not (DATA / "mca_coords.csv").exists():
-    with st.spinner("Première exécution : génération des données (2 à 5 min)…"):
+# Fichiers requis (pipeline peut être interrompu par timeout)
+_REQUIRED = [
+    DATA / "mca_coords.csv",
+    DATA / "mushroom_processed.csv",
+    TABLES / "sensitivity_k.csv",
+    TABLES / "model_comparison.csv",
+]
+if not all(f.exists() for f in _REQUIRED):
+    with st.spinner("Génération des données (2 à 5 min)…"):
         run_pipeline()
     st.rerun()
 
