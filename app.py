@@ -384,8 +384,9 @@ elif page == "Classification":
         st.caption("Résultats pré-calculés par le pipeline (LDA, Random Forest, SVM, Régression logistique).")
         mc = tables["model_comparison"].copy()
         mc.columns = [
-            "Modèle", "Accuracy train", "Accuracy CV", "Écart train/CV",
-            "Préc. vénéneux", "Recall vénéneux", "Préc. comestible", "Recall comestible", "F1 macro"
+            "Modèle", "Accuracy train", "Accuracy CV", "Écart-type CV",
+            "Préc. vénéneux", "Recall vénéneux", "Préc. comestible", "Recall comestible",
+            "F1 macro", "Écart overfitting"
         ]
         mc_display = mc[["Modèle", "Accuracy train", "Accuracy CV", "F1 macro"]]
         st.dataframe(
