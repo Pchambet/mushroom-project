@@ -331,7 +331,6 @@ mushroom-project/
 ├── app.py                             # Dashboard Streamlit
 ├── assets/                             # Images du README
 ├── Makefile                            # Orchestration
-├── run.sh                              # Lancement (pipeline + dashboard)
 └── requirements.txt                   # Dépendances
 ```
 

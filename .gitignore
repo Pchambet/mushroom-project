@@ -56,8 +56,10 @@ Desktop.ini
 # data/processed/*
 # !data/processed/.gitkeep
 
-# Documentation interne (pas sur GitHub)
+# Documentation et config locales (pas sur GitHub)
 docs/
+.devcontainer/
+.streamlit/
 
 # Données et outputs (générés par le pipeline)
 data/
