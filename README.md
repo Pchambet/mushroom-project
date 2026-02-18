@@ -295,9 +295,7 @@ make dashboard     # Dashboard en local
 ```bash
 make install       # Créer l'environnement + dépendances
 make run-all       # Pipeline complet (scripts 00 à 07)
-make run-A         # Download → Prepare → Describe → ACM
-make run-B         # Clustering → Discriminante
-make run-extended  # Sensibilité + Comparaison de modèles
+make run-extended  # Sensibilité + Comparaison de modèles (scripts 06–07)
 make dashboard     # Lancer le dashboard Streamlit
 make clean         # Supprimer les outputs
 make distclean     # Nettoyage complet (outputs + venv)
@@ -337,7 +335,6 @@ mushroom-project/
 
 | Document | Description |
 |---|---|
-| [`docs/AUDIT_COMPLET.md`](docs/AUDIT_COMPLET.md) | **Audit multi-expert** — 8 perspectives (mathématicien, data engineer, classification, clustering, visualisation, code, product) |
 | [`docs/data_dictionary.md`](docs/data_dictionary.md) | Dictionnaire des 23 variables et modalités |
 
 ---

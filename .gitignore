@@ -56,6 +56,9 @@ Desktop.ini
 # data/processed/*
 # !data/processed/.gitkeep
 
+# Audits (documentation interne, pas sur GitHub)
+docs/AUDIT_*.md
+
 # Reports (décommenter pour ne pas versionner les outputs)
 # reports/figures/*
 # !reports/figures/.gitkeep
