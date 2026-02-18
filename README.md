@@ -309,7 +309,7 @@ make help          # Aide
 <details>
 <summary><strong>Streamlit Cloud</strong></summary>
 
-Le dashboard en ligne génère les données au premier déploiement. Dans les paramètres de l'app sur [share.streamlit.io](https://share.streamlit.io), définir la **commande d'exécution** sur : `bash run.sh`
+Le dashboard génère automatiquement les données au premier chargement (2 à 5 min). Aucune configuration particulière requise.
 </details>
 
 ---

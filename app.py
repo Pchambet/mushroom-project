@@ -9,6 +9,8 @@ Lancer : streamlit run app.py
 
 from __future__ import annotations
 
+import subprocess
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -38,6 +40,29 @@ st.set_page_config(
 )
 
 
+# ── Génération des données si absentes (Streamlit Cloud) ─────────
+
+def run_pipeline() -> None:
+    """Exécute le pipeline complet. Utilisé quand data/ et reports/ sont absents."""
+    scripts = [
+        "src/00_download.py",
+        "src/01_prepare.py",
+        "src/02_describe.py",
+        "src/03_mca.py",
+        "src/04_cluster.py",
+        "src/05_discriminant.py",
+        "src/06_sensitivity.py",
+        "src/07_model_comparison.py",
+    ]
+    for script in scripts:
+        subprocess.run(
+            [sys.executable, script],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+        )
+
+
 # ── Chargement des données ───────────────────────────────────
 
 @st.cache_data
@@ -58,6 +83,12 @@ def load_tables():
 
 
 # ── Chargement sécurisé ──────────────────────────────────────
+
+# Si les données n'existent pas (ex. Streamlit Cloud), exécuter le pipeline
+if not (DATA / "mca_coords.csv").exists():
+    with st.spinner("Première exécution : génération des données (2 à 5 min)…"):
+        run_pipeline()
+    st.rerun()
 
 try:
     df, coords = load_data()
