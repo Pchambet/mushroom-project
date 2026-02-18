@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="reports/figures/banner.jpg" width="100%" alt="The Mushroom Project">
+  <img src="assets/banner.jpg" width="100%" alt="The Mushroom Project">
 </p>
 
 <p align="center">
@@ -88,7 +88,7 @@ Chaque champignon possède désormais une position sur une carte à 10 dimension
 Tous les axes ne se valent pas. Le premier capture 15,9 % de l'information totale, le deuxième 14,4 %, et ainsi de suite. À eux seuls, les huit premiers axes concentrent 90 % de l'information.
 
 <p align="center">
-  <img src="reports/figures/acm_scree.png" width="700" alt="Répartition de l'information par axe">
+  <img src="assets/acm_scree.png" width="700" alt="Répartition de l'information par axe">
 </p>
 
 Pas de coupure nette entre les axes — c'est **normal** pour des données catégorielles. En ACP (son équivalent pour des données numériques), on cherche un « coude » dans ce graphique pour choisir combien d'axes conserver. Ici, l'inertie décroît progressivement parce que les ~100 modalités contribuent chacune un peu.
@@ -100,7 +100,7 @@ Et le plus remarquable : **l'axe 1 est un « axe de sécurité alimentaire »**.
 Dès que l'on place les 8 124 champignons sur les deux premiers axes :
 
 <p align="center">
-  <img src="reports/figures/acm_individuals_12_color_target.png" width="700" alt="ACM — Individus colorés par classe">
+  <img src="assets/acm_individuals_12_color_target.png" width="700" alt="ACM — Individus colorés par classe">
 </p>
 
 Les comestibles (en vert) et les vénéneux (en rouge) **se séparent naturellement**. L'algorithme ne connaît même pas les étiquettes. Il a simplement lu les descriptions et découvert, de lui-même, que les champignons dangereux ne ressemblent pas aux autres.
@@ -124,8 +124,8 @@ C'est cela, le **clustering** : regrouper des points qui se ressemblent, sans é
 Les deux méthodes convergent vers **3 groupes naturels** :
 
 <p align="center">
-  <img src="reports/figures/cluster_on_acm12.png" width="48%" alt="Clusters sur plan ACM">
-  <img src="reports/figures/cluster_dendrogram.png" width="48%" alt="Arbre hiérarchique">
+  <img src="assets/cluster_on_acm12.png" width="48%" alt="Clusters sur plan ACM">
+  <img src="assets/cluster_dendrogram.png" width="48%" alt="Arbre hiérarchique">
 </p>
 
 | Cluster | Taille | Composition | Pureté |
@@ -165,8 +165,8 @@ Un modèle qui obtient 88,7 % de bonnes réponses sur les données d'entraîneme
 Pour le savoir, on recourt à la **validation croisée** : on découpe les 8 124 champignons en cinq parts égales. On entraîne le modèle sur quatre parts, on le teste sur la cinquième. Puis on tourne — cinq fois, chaque part servant de test une fois. C'est la seule manière de mesurer la performance réelle.
 
 <p align="center">
-  <img src="reports/figures/da_confusion_cv.png" width="45%" alt="Matrice de confusion">
-  <img src="reports/figures/da_cv_scores.png" width="50%" alt="Scores par fold">
+  <img src="assets/da_confusion_cv.png" width="45%" alt="Matrice de confusion">
+  <img src="assets/da_cv_scores.png" width="50%" alt="Scores par fold">
 </p>
 
 | Métrique | Signification | Valeur |
@@ -193,7 +193,7 @@ On a utilisé cinq axes ACM. Pourquoi pas trois ? Pourquoi pas huit ? Est-ce qu'
 On teste méthodiquement de 2 à 10 axes :
 
 <p align="center">
-  <img src="reports/figures/sensitivity_k_analysis.png" width="700" alt="Analyse de sensibilité">
+  <img src="assets/sensitivity_k_analysis.png" width="700" alt="Analyse de sensibilité">
 </p>
 
 Résultat contre-intuitif : **quatre axes offrent la meilleure performance (88,9 %)**, davantage que cinq (77,1 %) ou huit (80,0 %).
@@ -213,11 +213,11 @@ La LDA trace une frontière linéaire — une droite, en somme. Mais d'autres mo
 Quatre classifieurs, les mêmes coordonnées ACM. Qui l'emporte ?
 
 <p align="center">
-  <img src="reports/figures/model_comparison.png" width="700" alt="Comparaison de modèles">
+  <img src="assets/model_comparison.png" width="700" alt="Comparaison de modèles">
 </p>
 
 <p align="center">
-  <img src="reports/figures/model_comparison_boxplot.png" width="500" alt="Dispersion des scores">
+  <img src="assets/model_comparison_boxplot.png" width="500" alt="Dispersion des scores">
 </p>
 
 | Modèle | Entraînement | Données jamais vues | F1 |
@@ -256,7 +256,7 @@ Tout ce qui précède est interactif. Le dashboard permet de changer les axes, d
 > **[Ouvrir le dashboard](https://pchambet-mushroom-project.streamlit.app/)** — aucune installation requise.
 
 <p align="center">
-  <img src="reports/figures/dashboard_overview.png" width="100%" alt="Dashboard">
+  <img src="assets/dashboard_overview.png" width="100%" alt="Dashboard">
 </p>
 
 <details>
@@ -265,13 +265,13 @@ Tout ce qui précède est interactif. Le dashboard permet de changer les axes, d
 **Espace ACM** — choisir les axes, colorer par classe ou par cluster :
 
 <p align="center">
-  <img src="reports/figures/dashboard_acm.png" width="100%" alt="Dashboard — Espace ACM">
+  <img src="assets/dashboard_acm.png" width="100%" alt="Dashboard — Espace ACM">
 </p>
 
 **Clustering** — ajuster les paramètres et observer les groupes se former :
 
 <p align="center">
-  <img src="reports/figures/dashboard_clustering.png" width="100%" alt="Dashboard — Clustering">
+  <img src="assets/dashboard_clustering.png" width="100%" alt="Dashboard — Clustering">
 </p>
 
 </details>
@@ -280,12 +280,14 @@ Tout ce qui précède est interactif. Le dashboard permet de changer les axes, d
 
 ## Reproduire
 
+Les données et les outputs sont générés par le pipeline — rien à télécharger manuellement.
+
 ```bash
 git clone https://github.com/Pchambet/mushroom-project.git
 cd mushroom-project
 
 make install       # Environnement virtuel + dépendances
-make run-all       # Pipeline complet (00 → 07)
+make run-all       # Pipeline complet (00 → 07) — génère data/ et reports/
 make dashboard     # Dashboard en local
 ```
 
@@ -304,6 +306,12 @@ make help          # Aide
 
 </details>
 
+<details>
+<summary><strong>Streamlit Cloud</strong></summary>
+
+Le dashboard en ligne génère les données au premier déploiement. Dans les paramètres de l'app sur [share.streamlit.io](https://share.streamlit.io), définir la **commande d'exécution** sur : `bash run.sh`
+</details>
+
 ---
 
 ## Architecture
@@ -320,12 +328,10 @@ mushroom-project/
 │   ├── 06_sensitivity.py             #   Sensibilité (impact de k)
 │   ├── 07_model_comparison.py        #   LDA vs RF vs SVM vs LogReg
 │   └── utils.py                      #   Helpers
-├── app.py                            # Dashboard Streamlit
-├── reports/figures/                   # Figures (300 DPI)
-├── reports/tables/                    # Tables CSV
-├── data/                              # Données brutes + traitées
-├── docs/                              # Audit, dictionnaire
-├── Makefile                           # Orchestration
+├── app.py                             # Dashboard Streamlit
+├── assets/                             # Images du README
+├── Makefile                            # Orchestration
+├── run.sh                              # Lancement (pipeline + dashboard)
 └── requirements.txt                   # Dépendances
 ```
 

@@ -59,8 +59,6 @@ Desktop.ini
 # Documentation interne (pas sur GitHub)
 docs/
 
-# Reports (décommenter pour ne pas versionner les outputs)
-# reports/figures/*
-# !reports/figures/.gitkeep
-# reports/tables/*
-# !reports/tables/.gitkeep
+# Données et outputs (générés par le pipeline)
+data/
+reports/
