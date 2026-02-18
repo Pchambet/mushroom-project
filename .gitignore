@@ -61,6 +61,10 @@ docs/
 .devcontainer/
 .streamlit/
 
-# Données et outputs (générés par le pipeline)
-data/
-reports/
+# Données brutes (téléchargées par 00_download, pas versionnées)
+data/raw/
+
+# Figures (assets/ suffit pour le README ; reports/figures généré localement)
+reports/figures/
+
+# data/processed/ et reports/tables/ sont versionnés pour chargement instantané du dashboard
