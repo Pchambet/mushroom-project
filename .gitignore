@@ -1,70 +1,26 @@
-# ──────────────────────────────────────────────
-# The Mushroom Project — .gitignore
-# ──────────────────────────────────────────────
-
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-
-# Virtual environments
-env/
-venv/
-ENV/
 .venv/
-
-# Distribution / packaging
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Jupyter Notebook
+.pytest_cache/
+.ruff_cache/
 .ipynb_checkpoints/
-*/.ipynb_checkpoints/
+*.egg-info/
+build/
+dist/
 
-# IDE
+# Data: the raw UCI file is downloaded by `make data`.
+# data/processed/mushroom.csv is committed so the dashboard starts without network.
+data/raw/
+data/interim/
+
+# Local tooling and secrets
+.env
+.streamlit/secrets.toml
 .vscode/
-.cursor/
 .idea/
-*.swp
-*.swo
-*~
+.cursor/
 
 # OS
 .DS_Store
 Thumbs.db
-ehthumbs.db
-Desktop.ini
-
-# Data (décommenter pour ne pas versionner les données)
-# data/raw/*
-# !data/raw/.gitkeep
-# data/processed/*
-# !data/processed/.gitkeep
-
-# Documentation et config locales (pas sur GitHub)
-docs/
-.devcontainer/
-.streamlit/
-
-# Données brutes (téléchargées par 00_download, pas versionnées)
-data/raw/
-
-# Figures (assets/ suffit pour le README ; reports/figures généré localement)
-reports/figures/
-
-# data/processed/ et reports/tables/ sont versionnés pour chargement instantané du dashboard
