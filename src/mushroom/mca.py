@@ -6,6 +6,12 @@ needs: it can sit inside a cross-validation pipeline (fit on the training fold
 only, project the test fold with the transition formula), and its inertia
 bookkeeping is explicit. Explained inertia is reported against the *total*
 inertia (J - Q) / Q, not against the axes that happen to be kept.
+
+J - Q is only an upper bound on the number of axes. When some descriptors are
+exactly determined by others (as on UCI Mushroom), the indicator matrix has a
+lower rank and the remaining singular values are rounding error (~1e-15). Those
+null axes are dropped: their coordinates are noise, and a model that rescales
+features (LDA, k-NN after scaling) would happily learn from it.
 """
 
 from __future__ import annotations
@@ -22,14 +28,18 @@ class MCA(TransformerMixin, BaseEstimator):
     Parameters
     ----------
     n_components:
-        Number of principal axes to keep. ``None`` keeps every non-trivial axis.
+        Number of principal axes to keep. ``None`` keeps every axis with
+        non-zero inertia.
 
     Attributes
     ----------
     eigenvalues_:
         Principal inertias of the kept axes (squared singular values).
+    rank_:
+        Number of axes with non-zero inertia (numerical rank of the centred
+        indicator matrix), at most ``J - Q``.
     all_eigenvalues_:
-        Principal inertias of every non-trivial axis.
+        Principal inertias of those ``rank_`` axes.
     total_inertia_:
         Total inertia of the indicator matrix, ``(J - Q) / Q``.
     explained_inertia_:
@@ -54,17 +64,19 @@ class MCA(TransformerMixin, BaseEstimator):
         S = (P - np.outer(r, c)) / np.sqrt(np.outer(r, c))
         _, sigma, Vt = np.linalg.svd(S, full_matrices=False)
 
-        n_nontrivial = n_cats - self.n_variables_
-        k = n_nontrivial if self.n_components is None else self.n_components
-        if not 1 <= k <= n_nontrivial:
-            raise ValueError(f"n_components must be in [1, {n_nontrivial}], got {k}")
+        # Same tolerance as numpy.linalg.matrix_rank: anything below is rounding error.
+        tol = sigma.max(initial=0.0) * max(S.shape) * np.finfo(S.dtype).eps
+        self.rank_ = int(min((sigma > tol).sum(), n_cats - self.n_variables_))
+        k = self.rank_ if self.n_components is None else self.n_components
+        if not 1 <= k <= self.rank_:
+            raise ValueError(f"n_components must be in [1, {self.rank_}], got {k}")
 
         # SVD signs are arbitrary; fix them so the largest loading is positive.
         V = Vt[:k].T
         signs = np.sign(V[np.abs(V).argmax(axis=0), np.arange(k)])
         V = V * signs
 
-        self.all_eigenvalues_ = sigma[:n_nontrivial] ** 2
+        self.all_eigenvalues_ = sigma[: self.rank_] ** 2
         self.eigenvalues_ = self.all_eigenvalues_[:k]
         self.total_inertia_ = (n_cats - self.n_variables_) / self.n_variables_
         self.explained_inertia_ = self.eigenvalues_ / self.total_inertia_
@@ -78,9 +90,16 @@ class MCA(TransformerMixin, BaseEstimator):
         return self
 
     def transform(self, X: pd.DataFrame) -> np.ndarray:
-        """Row principal coordinates via the transition formula ``(Z / Q) D_c^{-1/2} V``."""
+        """Row principal coordinates via the transition formula ``(Z / Q) D_c^{-1/2} V``.
+
+        Each row is divided by its number of *known* categories rather than by Q:
+        a category unseen at fit time is encoded as an all-zero block, and
+        dividing by Q would pull that row toward the origin. A row with no known
+        category lands at the origin (the barycentre).
+        """
         Z = self.encoder_.transform(_as_frame(X))
-        return Z @ self._projection / self.n_variables_
+        n_known = np.maximum(Z.sum(axis=1, keepdims=True), 1)
+        return Z @ self._projection / n_known
 
     def benzecri_explained_inertia(self) -> np.ndarray:
         """Benzécri-corrected share of inertia for axes with eigenvalue above 1/Q.

@@ -27,7 +27,8 @@ def test_splitter_is_shuffled_and_stratified():
 def test_inertia_table_is_consistent(sample):
     X, y = sample
     table = ex.inertia_table(X, y)
-    assert len(table) == ex.n_nontrivial_axes(X)
+    assert len(table) == ex.n_mca_axes(X) < X.nunique().sum() - X.shape[1]
+    assert table["eigenvalue"].min() > 1e-12
     assert table["cumulative_inertia_pct"].iloc[-1] == pytest.approx(100)
     assert table["eta2_class"].between(0, 1).all()
 

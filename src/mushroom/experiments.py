@@ -55,8 +55,9 @@ def onehot_model(clf: ClassifierMixin, columns: list[str] | None = None) -> Pipe
     return make_pipeline(ColumnTransformer([("onehot", encoder, columns)]), clf)
 
 
-def n_nontrivial_axes(X: pd.DataFrame) -> int:
-    return int(X.nunique().sum() - X.shape[1])
+def n_mca_axes(X: pd.DataFrame) -> int:
+    """Axes with non-zero inertia; below the J - Q bound when descriptors are redundant."""
+    return MCA().fit(X).rank_
 
 
 # ── Unsupervised description ──────────────────────────────────────────────
@@ -127,7 +128,7 @@ def clusters(X: pd.DataFrame, y: pd.Series) -> tuple[pd.DataFrame, float]:
 
 def axis_curve(X: pd.DataFrame, y: pd.Series, grid: list[int] = AXIS_GRID) -> pd.DataFrame:
     """Out-of-fold accuracy as a function of the number of MCA axes kept."""
-    all_axes = n_nontrivial_axes(X)
+    all_axes = n_mca_axes(X)
     rows = []
     for name, make in classifiers().items():
         for k in [*[k for k in grid if k < all_axes], all_axes]:
@@ -154,7 +155,7 @@ def evaluate(model: BaseEstimator, X: pd.DataFrame, y: pd.Series) -> dict[str, f
 
 
 def reference_models(X: pd.DataFrame, y: pd.Series, tree_depth: int) -> pd.DataFrame:
-    all_axes = n_nontrivial_axes(X)
+    all_axes = n_mca_axes(X)
     n_categories = int(X.nunique().sum())
     onehot = f"one-hot ({n_categories} columns)"
     candidates = [
