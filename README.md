@@ -39,6 +39,8 @@ Correspondence analysis is the standard way to turn questionnaires, product attr
 
 η² is the share of an axis' variance explained by the label. Axis 1 is built by `ring-type = large`, silky stalk surfaces, `odor = foul` and `spore-print-color = chocolate` (categories whose specimens are 93.8 to 100% poisonous). The first five axes hold 31.8% of the total inertia (81.6% after Benzécri's correction). After axis 1, the axis most related to the label is axis 90 of 95.
 
+![Specimens on the first two MCA axes, coloured by class](docs/figures/mca_map.png)
+
 ### The error that matters
 
 ![Poisonous specimens predicted edible, per model](docs/figures/decision_errors.png)
