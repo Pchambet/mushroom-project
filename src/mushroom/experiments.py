@@ -127,11 +127,15 @@ def clusters(X: pd.DataFrame, y: pd.Series) -> tuple[pd.DataFrame, float]:
 
 def axis_curve(X: pd.DataFrame, y: pd.Series, grid: list[int] = AXIS_GRID) -> pd.DataFrame:
     """Out-of-fold accuracy as a function of the number of MCA axes kept."""
-    grid = [*[k for k in grid if k < n_nontrivial_axes(X)], n_nontrivial_axes(X)]
+    all_axes = n_nontrivial_axes(X)
     rows = []
     for name, make in classifiers().items():
-        for k in grid:
-            scores = cross_val_score(mca_model(k, make()), X, y, cv=cv_splitter())
+        for k in [*[k for k in grid if k < all_axes], all_axes]:
+            # The last point keeps every axis of each training fold (None), which
+            # stays valid even if a rare category is absent from a fold.
+            n_components = None if k == all_axes else k
+            model = mca_model(n_components, make())
+            scores = cross_val_score(model, X, y, cv=cv_splitter())
             rows.append({"model": name, "n_axes": k, "mean": scores.mean(), "std": scores.std()})
     return pd.DataFrame(rows)
 
