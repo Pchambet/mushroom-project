@@ -76,8 +76,16 @@ def test_axis_curve_all_axes_point_survives_folds_with_fewer_axes(sample, monkey
     )
     monkeypatch.setattr(ex, "classifiers", lambda: {"LDA": ex.shrinkage_lda})
     curve = ex.axis_curve(X, y, grid=[2])
-    assert curve["n_axes"].tolist() == [2, ex.n_mca_axes(X)]
-    assert curve["mean"].between(0.5, 1).all()
+    for _, sub in curve.groupby("model"):
+        assert sub["n_axes"].tolist() == [2, ex.n_mca_axes(X)]
+    assert curve["mean"].between(0, 1).all()
+
+
+def test_label_is_an_exact_linear_function_of_the_indicators(sample):
+    X, y = sample
+    assert ex.label_linear_residual(X, y) < 1e-8
+    # Without odour and spore print colour, the strongest predictors, it no longer is.
+    assert ex.label_linear_residual(X.drop(columns=["odor", "spore-print-color"]), y) > 0.1
 
 
 def test_describe_tree_only_claims_perfection_when_reached():

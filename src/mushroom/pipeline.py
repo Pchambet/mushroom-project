@@ -92,6 +92,8 @@ def headline(
     depth = ex.reference_tree_depth(sweep)
     tree = sweep.set_index("depth").loc[depth]
     all_axes = f"MCA, all {len(inertia)} axes"
+    by_model = curve.pivot(index="n_axes", columns="model", values="mean")
+    solver_gap = (by_model["LDA"] - by_model[ex.NO_SHRINKAGE]).abs()
     return {
         "n_specimens": len(X),
         "n_variables": X.shape[1],
@@ -123,6 +125,10 @@ def headline(
         "lda_all_axes": float(ref("LDA", all_axes)["cv_accuracy_mean"]),
         "lda_no_shrinkage_all_axes": float(ref(ex.NO_SHRINKAGE, all_axes)["cv_accuracy_mean"]),
         "lda_no_shrinkage_all_axes_std": float(ref(ex.NO_SHRINKAGE, all_axes)["cv_accuracy_std"]),
+        "lda_solver_max_gap_specimens_up_to_80_axes": round(
+            len(X) * float(solver_gap.loc[:80].max())
+        ),
+        "label_linear_residual": ex.label_linear_residual(X, y),
         "rf_5_axes": acc("Random forest", 5),
         "knn_5_axes": acc("k-NN (15)", 5),
         "lda_axes_for_99": axes_to_reach("LDA", 0.99),

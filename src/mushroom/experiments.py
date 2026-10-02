@@ -73,6 +73,17 @@ def n_mca_axes(X: pd.DataFrame) -> int:
     return MCA().fit(X).rank_
 
 
+def label_linear_residual(X: pd.DataFrame, y: pd.Series) -> float:
+    """Largest residual of a least-squares fit of the 0/1 label on the indicator columns.
+
+    Zero (up to rounding) means the label is an exact linear function of the
+    categories, which is what makes the all-axes within-class covariance singular.
+    """
+    Z = OneHotEncoder(sparse_output=False).fit_transform(X)
+    w, *_ = np.linalg.lstsq(Z, y.to_numpy(dtype=float), rcond=None)
+    return float(np.abs(Z @ w - y.to_numpy()).max())
+
+
 # ── Unsupervised description ──────────────────────────────────────────────
 
 
@@ -140,10 +151,14 @@ def clusters(X: pd.DataFrame, y: pd.Series) -> tuple[pd.DataFrame, float]:
 
 
 def axis_curve(X: pd.DataFrame, y: pd.Series, grid: list[int] = AXIS_GRID) -> pd.DataFrame:
-    """Out-of-fold accuracy as a function of the number of MCA axes kept."""
+    """Out-of-fold accuracy as a function of the number of MCA axes kept.
+
+    The default-solver LDA is tracked too, to show where it departs from the
+    shrinkage LDA used everywhere else.
+    """
     all_axes = n_mca_axes(X)
     rows = []
-    for name, make in classifiers().items():
+    for name, make in (classifiers() | {NO_SHRINKAGE: LinearDiscriminantAnalysis}).items():
         for k in [*[k for k in grid if k < all_axes], all_axes]:
             # The last point keeps every axis of each training fold (None), which
             # stays valid even if a rare category is absent from a fold.
