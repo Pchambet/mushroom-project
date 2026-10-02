@@ -1,0 +1,10 @@
+model,features,n_features,cv_accuracy_mean,cv_accuracy_std,poisonous_called_edible,edible_called_poisonous
+Majority class,none,0,0.517971,0.000245092,3916,0
+Odour-only lookup,odor,9,0.985229,0.00266825,120,0
+LDA,"MCA, 1 axis",1,0.885771,0.00675105,862,66
+LDA,"MCA, 5 axes",5,0.882078,0.00971088,816,142
+k-NN (15),"MCA, 5 axes",5,0.992983,0.00143707,36,21
+Random forest,"MCA, 5 axes",5,0.997907,0.000834681,10,7
+LDA,"MCA, all 95 axes",95,1,0,0,0
+Logistic regression,one-hot (116 columns),116,0.999877,0.000246154,1,0
+Decision tree (depth 7),one-hot (116 columns),116,1,0,0,0

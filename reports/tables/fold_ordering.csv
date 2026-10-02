@@ -1,0 +1,21 @@
+model,split,fold,accuracy
+"LDA, 5 axes",unshuffled (cv=5),1,0.730462
+"LDA, 5 axes",unshuffled (cv=5),2,0.963692
+"LDA, 5 axes",unshuffled (cv=5),3,0.804923
+"LDA, 5 axes",unshuffled (cv=5),4,0.996923
+"LDA, 5 axes",unshuffled (cv=5),5,0.571429
+"LDA, 5 axes",shuffled,1,0.868308
+"LDA, 5 axes",shuffled,2,0.891692
+"LDA, 5 axes",shuffled,3,0.893538
+"LDA, 5 axes",shuffled,4,0.874462
+"LDA, 5 axes",shuffled,5,0.882389
+"Random forest, 5 axes",unshuffled (cv=5),1,0.753846
+"Random forest, 5 axes",unshuffled (cv=5),2,0.990769
+"Random forest, 5 axes",unshuffled (cv=5),3,0.921231
+"Random forest, 5 axes",unshuffled (cv=5),4,0.989538
+"Random forest, 5 axes",unshuffled (cv=5),5,0.596059
+"Random forest, 5 axes",shuffled,1,0.996923
+"Random forest, 5 axes",shuffled,2,0.997538
+"Random forest, 5 axes",shuffled,3,0.997538
+"Random forest, 5 axes",shuffled,4,0.999385
+"Random forest, 5 axes",shuffled,5,0.998153
