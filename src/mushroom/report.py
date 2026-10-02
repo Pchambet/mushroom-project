@@ -22,6 +22,7 @@ from mushroom.config import (
 from mushroom.data import load_processed
 from mushroom.figures import MODEL_COLORS
 from mushroom.mca import MCA
+from mushroom.pipeline import describe_tree
 
 REPO = "https://github.com/Pchambet/mushroom-project"
 GRIDLINE = "rgba(100,116,139,0.22)"
@@ -207,22 +208,26 @@ read it</em>. Every score below is out-of-fold, with the MCA refitted inside eac
 {r["odour_poisonous_called_edible"]} poisonous called edible</span></div>
 <div class="kpi"><b>{pct(r["lda_5_axes"])}</b><span>LDA on 5 MCA axes</span></div>
 <div class="kpi"><b>{pct(r["rf_5_axes"])}</b><span>random forest on the same 5 axes</span></div>
-<div class="kpi"><b>{r["tree_perfect_leaves"]} leaves</b><span>a depth-{r["tree_perfect_depth"]}
-tree on one-hot is perfect</span></div>
+<div class="kpi"><b>{pct(r["tree_accuracy"])}</b><span>{describe_tree(r)} on the
+one-hot table</span></div>
 </div>
 
 <h2>Accuracy against the number of axes kept</h2>
 <p>With five axes, the non-linear readers reach {pct(r["knn_5_axes"])} (k-NN) and
 {pct(r["rf_5_axes"])} (random forest). LDA never exceeds {pct(r["lda_max_axes_1_9"])} with up
-to nine axes and needs {r["lda_axes_for_99"]} to reach 99%: the information is there, but not
-along a straight line.</p>
+to nine axes and needs {r["lda_axes_for_99"]} to reach 99%: five axes keep the information, but
+not along a straight line. With every axis, LDA reads it perfectly
+({pct(r["lda_all_axes"])}), because the label is an exact linear function of the 116
+indicator columns.</p>
 <div class="chart">{axis_curve_chart(r)}</div>
 
 <h2>Which axes carry the label</h2>
 <p>η² is the share of an axis' variance explained by the edible/poisonous label. Axis 1 has
 η² = {r["eta2_axis1"]:.2f}; axes 2 to 9 never exceed {r["eta2_axes_2_9_max"]:.2f}, while axis
-{r["eta2_best_minor_axis"]}, one of the smallest, reaches {r["eta2_best_minor_value"]:.2f}. Ordering
-axes by inertia is not ordering them by usefulness.</p>
+{r["eta2_runner_up_axis"]}, with only {r["eta2_runner_up_inertia_pct"]:.1f}% of the inertia,
+reaches {r["eta2_runner_up_value"]:.2f}, and LDA jumps when it enters. Ordering axes by inertia
+is not ordering them by usefulness. The data have {r["n_axes"]} axes with non-zero inertia, not
+the {r["n_axes_upper_bound"]} that J − Q suggests: some descriptors are exactly redundant.</p>
 <div class="chart">{eta_chart()}</div>
 <p>The first five axes hold {r["inertia_axes_1_5_pct"]:.1f}% of the total inertia
 ({r["benzecri_axes_1_5_pct"]:.1f}% after Benzécri's correction).</p>
@@ -249,6 +254,10 @@ folds the LDA spread drops to ±{pct(r["shuffled_lda_std"])} and the random fore
 <p>The records are hypothetical specimens generated from a field guide's descriptions of 23
 species, not field observations; random folds therefore test interpolation within known
 species, not recognition of a new one. Nothing here is advice on what to eat.</p>
+<p>LDA uses Ledoit-Wolf shrinkage throughout. With every axis kept, scikit-learn's default
+LDA (SVD solver) scores {pct(r["lda_no_shrinkage_all_axes"])}: the within-class covariance is
+singular exactly along the direction that separates the classes, and that solver discards it.
+With up to 80 axes the two solvers agree to within a few specimens.</p>
 
 <footer>Code, data provenance and tests: <a href="{REPO}">{REPO.removeprefix("https://")}</a>.
 Data: UCI Machine Learning Repository, Mushroom (CC BY 4.0).<br>

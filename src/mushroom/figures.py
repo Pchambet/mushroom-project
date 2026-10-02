@@ -24,6 +24,7 @@ from mushroom.config import (
     TEAL,
 )
 from mushroom.data import load_processed
+from mushroom.experiments import NO_SHRINKAGE
 from mushroom.mca import MCA
 
 MODEL_COLORS = {"LDA": SLATE, "k-NN (15)": AMBER, "Random forest": TEAL}
@@ -97,7 +98,7 @@ def hero(results: dict) -> None:
     ax.set_xlabel("MCA axes kept (log scale)")
     ax.set_ylabel("Out-of-fold accuracy (%)")
     ax.set_title(
-        "Five MCA axes keep the toxicity signal, but a linear rule cannot read it",
+        "Five MCA axes keep the toxicity signal, but LDA cannot read it from five axes",
         pad=12,
     )
     _save(fig, "hero")
@@ -105,8 +106,8 @@ def hero(results: dict) -> None:
 
 def axis_signal(results: dict) -> None:
     inertia = _table("mca_inertia")
-    fig, ax = plt.subplots(figsize=(9, 4.2))
-    strong = inertia["eta2_class"] >= 0.05
+    fig, ax = plt.subplots(figsize=(9, 4.2), layout="constrained")
+    strong = inertia["eta2_class"] >= 0.03
     ax.bar(
         inertia["axis"],
         inertia["eta2_class"],
@@ -125,8 +126,10 @@ def axis_signal(results: dict) -> None:
     ax.set_xlabel("MCA axis (ordered by inertia, largest first)")
     ax.set_ylabel("η² with the edible/poisonous label")
     ax.set_xlim(0, len(inertia) + 1)
+    runner_up = results["eta2_runner_up_axis"]
     ax.set_title(
-        "The class signal sits on axis 1 and on low-inertia axes a variance cut would drop",
+        f"Axis {runner_up} holds {results['eta2_runner_up_inertia_pct']:.1f}% of the inertia, "
+        f"yet more of the label than axes 2 to {runner_up - 1}",
         pad=10,
     )
     _save(fig, "axis_signal")
@@ -166,7 +169,8 @@ def fold_ordering(results: dict) -> None:
 
 def decision_errors(results: dict) -> None:
     ref = _table("reference_models")
-    ref = ref[ref["model"] != "Majority class"].iloc[::-1]
+    # The no-shrinkage row documents a solver failure, not a modelling choice.
+    ref = ref[~ref["model"].isin(["Majority class", NO_SHRINKAGE])].iloc[::-1]
     labels = [f"{m}  ·  {f}" for m, f in zip(ref["model"], ref["features"], strict=True)]
     fig, ax = plt.subplots(figsize=(9, 4.4))
     bars = ax.barh(

@@ -30,6 +30,7 @@ from mushroom.config import (
 )
 from mushroom.data import load_processed
 from mushroom.mca import MCA
+from mushroom.pipeline import describe_tree
 
 REPO = "https://github.com/Pchambet/mushroom-project"
 REPORT = "https://pchambet.github.io/mushroom-project/"
@@ -75,8 +76,8 @@ if page == "Overview":
     st.title("What does an MCA keep, and lose, on the UCI Mushroom data?")
     st.markdown(
         f"The data are almost perfectly separable: odour alone is "
-        f"{results['odour_accuracy']:.1%} accurate and a depth-{results['tree_perfect_depth']} "
-        "decision tree is perfect. The question here is what a low-dimensional "
+        f"{results['odour_accuracy']:.1%} accurate and {describe_tree(results)} on the "
+        "one-hot table. The question here is what a low-dimensional "
         "multiple correspondence analysis preserves, and which models can read it. "
         "All scores are out-of-fold (5 shuffled stratified folds, MCA refitted per fold)."
     )
@@ -158,8 +159,8 @@ elif page == "Classification":
     )
     st.caption(
         f"With five axes, LDA scores {results['lda_5_axes']:.1%} while random forest scores "
-        f"{results['rf_5_axes']:.1%}: the axes keep the information, a linear rule cannot "
-        "read it."
+        f"{results['rf_5_axes']:.1%}: five axes keep the toxicity signal, but LDA cannot read "
+        "it from five axes."
     )
 
 else:
