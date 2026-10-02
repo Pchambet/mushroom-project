@@ -1,21 +1,21 @@
-model,split,fold,accuracy
-"LDA, 5 axes",unshuffled (cv=5),1,0.730462
-"LDA, 5 axes",unshuffled (cv=5),2,0.963692
-"LDA, 5 axes",unshuffled (cv=5),3,0.804923
-"LDA, 5 axes",unshuffled (cv=5),4,0.996923
-"LDA, 5 axes",unshuffled (cv=5),5,0.599138
-"LDA, 5 axes",shuffled,1,0.868308
-"LDA, 5 axes",shuffled,2,0.891692
-"LDA, 5 axes",shuffled,3,0.893538
-"LDA, 5 axes",shuffled,4,0.874462
-"LDA, 5 axes",shuffled,5,0.882389
-"Random forest, 5 axes",unshuffled (cv=5),1,0.753231
-"Random forest, 5 axes",unshuffled (cv=5),2,0.990769
-"Random forest, 5 axes",unshuffled (cv=5),3,0.921231
-"Random forest, 5 axes",unshuffled (cv=5),4,0.989538
-"Random forest, 5 axes",unshuffled (cv=5),5,0.607143
-"Random forest, 5 axes",shuffled,1,0.996923
-"Random forest, 5 axes",shuffled,2,0.997538
-"Random forest, 5 axes",shuffled,3,0.997538
-"Random forest, 5 axes",shuffled,4,0.999385
-"Random forest, 5 axes",shuffled,5,0.998153
+model,split,fold,accuracy,test_size,test_poisonous_pct,unseen_categories,specimens_with_unseen
+"LDA, 5 axes",unshuffled (cv=5),1,0.730462,1625,48.2462,1,256
+"LDA, 5 axes",unshuffled (cv=5),2,0.963692,1625,48.1846,0,0
+"LDA, 5 axes",unshuffled (cv=5),3,0.804923,1625,48.1846,2,28
+"LDA, 5 axes",unshuffled (cv=5),4,0.996923,1625,48.1846,0,0
+"LDA, 5 axes",unshuffled (cv=5),5,0.599138,1624,48.2143,14,346
+"LDA, 5 axes",shuffled,1,0.868308,1625,48.2462,0,0
+"LDA, 5 axes",shuffled,2,0.891692,1625,48.1846,0,0
+"LDA, 5 axes",shuffled,3,0.893538,1625,48.1846,0,0
+"LDA, 5 axes",shuffled,4,0.874462,1625,48.1846,0,0
+"LDA, 5 axes",shuffled,5,0.882389,1624,48.2143,0,0
+"Random forest, 5 axes",unshuffled (cv=5),1,0.753231,1625,48.2462,1,256
+"Random forest, 5 axes",unshuffled (cv=5),2,0.990769,1625,48.1846,0,0
+"Random forest, 5 axes",unshuffled (cv=5),3,0.921231,1625,48.1846,2,28
+"Random forest, 5 axes",unshuffled (cv=5),4,0.989538,1625,48.1846,0,0
+"Random forest, 5 axes",unshuffled (cv=5),5,0.607143,1624,48.2143,14,346
+"Random forest, 5 axes",shuffled,1,0.996923,1625,48.2462,0,0
+"Random forest, 5 axes",shuffled,2,0.997538,1625,48.1846,0,0
+"Random forest, 5 axes",shuffled,3,0.997538,1625,48.1846,0,0
+"Random forest, 5 axes",shuffled,4,0.999385,1625,48.1846,0,0
+"Random forest, 5 axes",shuffled,5,0.998153,1624,48.2143,0,0

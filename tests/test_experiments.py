@@ -17,12 +17,32 @@ def test_correlation_ratio_hand_cases():
 
 
 def test_splitter_is_shuffled_and_stratified():
-    y = np.array([0] * 50 + [1] * 50)  # sorted, like the UCI file
+    # Rows in blocks: the UCI file is ordered by descriptor pattern, so unshuffled
+    # stratified folds are contiguous blocks even when every fold has the same class mix.
+    y = np.array([0] * 50 + [1] * 50)
     splitter = cv_splitter()
     assert isinstance(splitter, StratifiedKFold) and splitter.shuffle
     for _, test in splitter.split(np.zeros(len(y)), y):
         assert y[test].mean() == pytest.approx(0.5)
         assert np.diff(test).max() > 1  # not a contiguous block
+
+
+def test_unseen_in_training_counts_categories_and_specimens():
+    X = pd.DataFrame({"odor": ["a", "a", "b", "c", "c"], "ring": ["x", "y", "x", "x", "z"]})
+    train, test = np.array([0, 1, 2]), np.array([3, 4])
+    # test categories c (odor) and z (ring) never appear in training; both test rows carry one
+    assert ex.unseen_in_training(X, train, test) == (2, 2)
+    assert ex.unseen_in_training(X, np.array([0, 1, 2, 3, 4]), test) == (0, 0)
+
+
+def test_unshuffled_folds_keep_the_class_mix_but_shuffled_folds_see_every_category(sample):
+    X, y = sample
+    unshuffled = list(StratifiedKFold(n_splits=5).split(X, y))
+    shares = [y.iloc[test].mean() for _, test in unshuffled]
+    assert max(shares) - min(shares) < 0.01
+    shuffled = sum(ex.unseen_in_training(X, tr, te)[1] for tr, te in cv_splitter().split(X, y))
+    unshuffled_unseen = sum(ex.unseen_in_training(X, tr, te)[1] for tr, te in unshuffled)
+    assert unshuffled_unseen > shuffled
 
 
 def test_inertia_table_is_consistent(sample):

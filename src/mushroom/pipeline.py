@@ -86,6 +86,9 @@ def headline(
     spread = folds.groupby(["model", "split"])["accuracy"].agg(
         mean="mean", std=lambda s: s.std(ddof=0)
     )
+    split_facts = folds[folds["model"] == folds["model"].iloc[0]].set_index(["split", "fold"])
+    unshuffled = split_facts.loc["unshuffled (cv=5)"]
+    worst_fold = int(unshuffled["specimens_with_unseen"].idxmax())
     eta = inertia.set_index("axis")["eta2_class"]
     linear_axes = inertia[inertia["axis"].between(2, 9)]
     runner_up = int(eta.loc[2:].idxmax())
@@ -154,6 +157,20 @@ def headline(
             spread.loc[("Random forest, 5 axes", "unshuffled (cv=5)"), "std"]
         ),
         "shuffled_rf_mean": float(spread.loc[("Random forest, 5 axes", "shuffled"), "mean"]),
+        "unshuffled_fold_poisonous_pct_min": float(unshuffled["test_poisonous_pct"].min()),
+        "unshuffled_fold_poisonous_pct_max": float(unshuffled["test_poisonous_pct"].max()),
+        "unshuffled_folds_without_unseen": int((unshuffled["unseen_categories"] == 0).sum()),
+        "unshuffled_worst_fold": worst_fold,
+        "unshuffled_worst_fold_unseen_categories": int(
+            unshuffled.loc[worst_fold, "unseen_categories"]
+        ),
+        "unshuffled_worst_fold_specimens_with_unseen": int(
+            unshuffled.loc[worst_fold, "specimens_with_unseen"]
+        ),
+        "unshuffled_worst_fold_size": int(unshuffled.loc[worst_fold, "test_size"]),
+        "shuffled_specimens_with_unseen": int(
+            split_facts.loc["shuffled", "specimens_with_unseen"].sum()
+        ),
         "kmeans_ari": ari,
         "kmeans_largest_cluster_poisonous_pct": float(cluster_table["poisonous_pct"].iloc[0]),
     }

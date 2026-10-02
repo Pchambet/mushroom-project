@@ -27,8 +27,10 @@ N_FOLDS = 5
 def cv_splitter() -> StratifiedKFold:
     """The one splitter used everywhere.
 
-    The UCI file is sorted in long same-class runs, so an unshuffled split puts
-    very different class mixes in each fold; shuffling is not optional here.
+    The UCI file is ordered in blocks of similar descriptor patterns (roughly by
+    species). Stratification alone keeps the class mix of each fold, but without
+    shuffling each test fold is one contiguous block whose categories may be absent
+    from training; shuffling makes the folds samples of the same population.
     """
     return StratifiedKFold(n_splits=N_FOLDS, shuffle=True, random_state=SEED)
 

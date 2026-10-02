@@ -46,6 +46,14 @@
   "unshuffled_rf_mean": 0.8523824175824176,
   "unshuffled_rf_std": 0.15011747223944788,
   "shuffled_rf_mean": 0.9979074649488442,
+  "unshuffled_fold_poisonous_pct_min": 48.184615384615384,
+  "unshuffled_fold_poisonous_pct_max": 48.246153846153845,
+  "unshuffled_folds_without_unseen": 2,
+  "unshuffled_worst_fold": 5,
+  "unshuffled_worst_fold_unseen_categories": 14,
+  "unshuffled_worst_fold_specimens_with_unseen": 346,
+  "unshuffled_worst_fold_size": 1624,
+  "shuffled_specimens_with_unseen": 0,
   "kmeans_ari": 0.3779957804786076,
   "kmeans_largest_cluster_poisonous_pct": 17.699306759098786
 }

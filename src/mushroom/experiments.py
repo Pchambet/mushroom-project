@@ -238,16 +238,42 @@ def tree_depth_sweep(X: pd.DataFrame, y: pd.Series, max_depth: int = 8) -> pd.Da
     return pd.DataFrame(rows)
 
 
+def unseen_in_training(X: pd.DataFrame, train: np.ndarray, test: np.ndarray) -> tuple[int, int]:
+    """Categories in the test rows that the training rows never show, and specimens carrying one.
+
+    The MCA cannot place a category it has never seen (it contributes nothing to the
+    row's coordinates), so these counts say how far a test fold lies outside training.
+    """
+    unseen = np.zeros(len(test), dtype=bool)
+    n_categories = 0
+    for column in X.columns:
+        test_values = X[column].iloc[test]
+        missing = ~test_values.isin(set(X[column].iloc[train])).to_numpy()
+        n_categories += test_values[missing].nunique()
+        unseen |= missing
+    return n_categories, int(unseen.sum())
+
+
 def fold_ordering(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
     """Per-fold accuracy with sklearn's default ``cv=5`` (no shuffle) versus shuffled folds.
 
-    The UCI file is sorted in long same-class runs; without shuffling, each fold
-    sees a different slice of the catalogue and the spread across folds measures
-    the file order, not the model.
+    ``cv=5`` on a classifier is stratified, so every test fold has the same class mix.
+    But it does not shuffle, and the UCI file is ordered in blocks of similar descriptor
+    patterns (roughly by species), so each unshuffled test fold is a contiguous block
+    whose categories may never appear in its training folds. The unshuffled spread is
+    therefore a rough proxy for performance on species missing from training, not a
+    property of the model on the population that random folds sample.
     """
     splitters = {
         "unshuffled (cv=5)": StratifiedKFold(n_splits=5),
         "shuffled": cv_splitter(),
+    }
+    fold_facts = {
+        split_name: [
+            (len(test), 100 * y.iloc[test].mean(), *unseen_in_training(X, train, test))
+            for train, test in splitter.split(X, y)
+        ]
+        for split_name, splitter in splitters.items()
     }
     models = {
         "LDA, 5 axes": mca_model(5, shrinkage_lda()),
@@ -258,8 +284,19 @@ def fold_ordering(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         for split_name, splitter in splitters.items():
             scores = cross_val_score(clone(model), X, y, cv=splitter)
             rows += [
-                {"model": model_name, "split": split_name, "fold": i + 1, "accuracy": s}
-                for i, s in enumerate(scores)
+                {
+                    "model": model_name,
+                    "split": split_name,
+                    "fold": i + 1,
+                    "accuracy": score,
+                    "test_size": size,
+                    "test_poisonous_pct": poisonous_pct,
+                    "unseen_categories": n_unseen,
+                    "specimens_with_unseen": n_specimens,
+                }
+                for i, (score, (size, poisonous_pct, n_unseen, n_specimens)) in enumerate(
+                    zip(scores, fold_facts[split_name], strict=True)
+                )
             ]
     return pd.DataFrame(rows)
 
