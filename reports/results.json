@@ -25,6 +25,8 @@
   "lda_all_axes": 1.0,
   "lda_no_shrinkage_all_axes": 0.645365365668814,
   "lda_no_shrinkage_all_axes_std": 0.06737438373003489,
+  "lda_solver_max_gap_specimens_up_to_80_axes": 4,
+  "label_linear_residual": 2.2787327580431338e-14,
   "rf_5_axes": 0.9979074649488442,
   "knn_5_axes": 0.9929834785903751,
   "lda_axes_for_99": 19,
