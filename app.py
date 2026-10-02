@@ -158,9 +158,9 @@ elif page == "Classification":
         width="stretch",
     )
     st.caption(
-        f"With five axes, LDA scores {results['lda_5_axes']:.1%} while random forest scores "
-        f"{results['rf_5_axes']:.1%}: five axes keep the toxicity signal, but LDA cannot read "
-        "it from five axes."
+        f"Reference, from the study: with five axes, LDA scores {results['lda_5_axes']:.1%} "
+        f"and random forest {results['rf_5_axes']:.1%}; LDA needs "
+        f"{results['lda_axes_for_99']} axes to reach 99%."
     )
 
 else:

@@ -81,14 +81,14 @@ def hero(results: dict) -> None:
             "LDA (linear)",
             SLATE,
             (
-                f"{100 * results['lda_5_axes']:.1f}% with 5 axes, "
-                f"99% only at {results['lda_axes_for_99']}"
+                f"{100 * results['lda_5_axes']:.1f}% with 5 axes,\n"
+                f"reaches 99% only at {results['lda_axes_for_99']} axes"
             ),
         ),
     ]
     for i, (name, color, text) in enumerate(labels):
         y = 86.2 - 1.6 * i
-        ax.text(8.2, y, f"{name}: {text}", color=color, fontsize=10, fontweight="bold")
+        ax.text(6.4, y, f"{name}: {text}", va="top", color=color, fontsize=10, fontweight="bold")
     ax.set_xscale("log")
     ticks = [1, 2, 3, 5, 10, 20, 40, results["n_axes"]]
     ax.set_xticks(ticks, [str(t) for t in ticks])
@@ -98,7 +98,7 @@ def hero(results: dict) -> None:
     ax.set_xlabel("MCA axes kept (log scale)")
     ax.set_ylabel("Out-of-fold accuracy (%)")
     ax.set_title(
-        "Five MCA axes keep the toxicity signal, but LDA cannot read it from five axes",
+        f"Five MCA axes keep the toxicity signal; LDA needs {results['lda_axes_for_99']} to read it",
         pad=12,
     )
     _save(fig, "hero")
@@ -151,14 +151,16 @@ def fold_ordering(results: dict) -> None:
             ax.text(
                 i, floor + 1.5, f"{mean:.1f} ± {std:.1f}", ha="center", color=color, fontsize=9.5
             )
-        ax.set_xticks([0, 1], ["unshuffled\n(sklearn cv=5)", "shuffled\nstratified"])
+        ax.set_xticks(
+            [0, 1], ["stratified, unshuffled\n(sklearn cv=5)", "stratified, shuffled\n(seed 42)"]
+        )
         ax.set_xlim(-0.6, 1.6)
         ax.set_title(model, fontsize=11)
         ax.grid(axis="x", visible=False)
     axes[0].set_ylabel("Accuracy per fold (%)")
     axes[0].set_ylim(floor, 101)
     fig.suptitle(
-        "The 'unstable model' was the file order: shuffling the folds removes the spread",
+        "Unshuffled folds test unseen descriptor blocks; shuffled folds remove the spread",
         x=0.01,
         ha="left",
         fontweight="bold",

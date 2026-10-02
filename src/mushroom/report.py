@@ -47,8 +47,11 @@ def _layout(fig: go.Figure, **kwargs: object) -> go.Figure:
     return fig
 
 
-def _div(fig: go.Figure) -> str:
-    return fig.to_html(full_html=False, include_plotlyjs=False, config={"displaylogo": False})
+def _div(fig: go.Figure, div_id: str) -> str:
+    """Fixed div ids keep site/index.html byte-identical when the data have not changed."""
+    return fig.to_html(
+        full_html=False, include_plotlyjs=False, div_id=div_id, config={"displaylogo": False}
+    )
 
 
 def axis_curve_chart(results: dict) -> str:
@@ -80,7 +83,8 @@ def axis_curve_chart(results: dict) -> str:
                 "range": [-0.05, 2.05],
             },
             yaxis={"title": "Out-of-fold accuracy (%)", "range": [80, 100.5]},
-        )
+        ),
+        "chart-axis-curve",
     )
 
 
@@ -101,7 +105,8 @@ def eta_chart() -> str:
             fig,
             xaxis={"title": "MCA axis (largest inertia first)"},
             yaxis={"title": "η² with the label"},
-        )
+        ),
+        "chart-eta",
     )
 
 
@@ -120,7 +125,9 @@ def map_chart() -> str:
             customdata=X.loc[mask, "odor"],
             hovertemplate="odour: %{customdata}<extra>" + name + "</extra>",
         )
-    return _div(_layout(fig, xaxis={"title": "Axis 1"}, yaxis={"title": "Axis 2"}, height=460))
+    return _div(
+        _layout(fig, xaxis={"title": "Axis 1"}, yaxis={"title": "Axis 2"}, height=460), "chart-map"
+    )
 
 
 def fold_chart() -> str:
@@ -137,7 +144,9 @@ def fold_chart() -> str:
             pointpos=0,
             jitter=0.3,
         )
-    return _div(_layout(fig, boxmode="group", yaxis={"title": "Accuracy per fold (%)"}))
+    return _div(
+        _layout(fig, boxmode="group", yaxis={"title": "Accuracy per fold (%)"}), "chart-folds"
+    )
 
 
 def reference_table() -> str:
@@ -240,14 +249,22 @@ errors are of that kind (odourless poisonous specimens).</p>
 {reference_table()}
 
 <h2>Why the earlier version of this project was wrong</h2>
-<p>The first version used scikit-learn's default <code>cv=5</code>, which does not shuffle.
-The UCI file is sorted in long same-class runs, so each fold saw a different slice of the
-catalogue. The spread across folds was read as an unstable model, and the random forest's
-train/test gap as overfitting. Re-running that protocol on the current pipeline gives LDA
+<p>The first version used scikit-learn's default <code>cv=5</code>, which is stratified but
+not shuffled. Every unshuffled test fold has the same class mix
+({r["unshuffled_fold_poisonous_pct_min"]:.1f}% poisonous), but the UCI file is ordered by
+descriptor pattern (roughly by species), so each test fold is a contiguous block whose
+categories may never appear in training: fold {r["unshuffled_worst_fold"]} holds
+{r["unshuffled_worst_fold_specimens_with_unseen"]:,} specimens (of
+{r["unshuffled_worst_fold_size"]:,}) carrying {r["unshuffled_worst_fold_unseen_categories"]}
+categories its training folds never show, and {r["unshuffled_folds_without_unseen"]} folds
+have none. Re-running that protocol on the current pipeline gives LDA
 {pct(r["unshuffled_lda_mean"])} ± {pct(r["unshuffled_lda_std"])} and random forest
 {pct(r["unshuffled_rf_mean"])} ± {pct(r["unshuffled_rf_std"])}. With shuffled stratified
 folds the LDA spread drops to ±{pct(r["shuffled_lda_std"])} and the random forest scores
-{pct(r["shuffled_rf_mean"])}.</p>
+{pct(r["shuffled_rf_mean"])}. The first version read the spread as an unstable model and the
+random forest's train/test gap as overfitting; both readings were wrong. The unshuffled
+spread is not pure noise either: it is a rough proxy for performance on species missing from
+training, which random folds cannot measure.</p>
 <div class="chart">{fold_chart()}</div>
 
 <h2>Limitations</h2>
