@@ -1,74 +1,38 @@
-# ──────────────────────────────────────────────────────────────
-# The Mushroom Project — Makefile
-# Pipeline d'analyse statistique multivariée
-# ──────────────────────────────────────────────────────────────
+.PHONY: help setup data run report all app test lint format requirements clean
 
-PYTHON  := ./venv/bin/python
-PIP     := ./venv/bin/pip
-SRC     := src
-VENV    := venv
+help:  ## Show the available targets
+	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*##"}; {printf "  %-14s %s\n", $$1, $$2}'
 
-.PHONY: help install run-all run-extended dashboard clean distclean
+setup:  ## Create the environment from uv.lock
+	uv sync --locked
 
-# ── Aide ────────────────────────────────────────────────────
+data:  ## Download (cached, checksum-verified) and tidy the UCI file
+	uv run mushroom data
 
-help: ## Afficher cette aide
-	@echo ""
-	@echo "  The Mushroom Project — Commandes disponibles"
-	@echo "  ─────────────────────────────────────────────"
-	@echo ""
-	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
-		awk 'BEGIN {FS = ":.*##"}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
-	@echo ""
+run:  ## Run every experiment and redraw the README figures (5-10 min)
+	uv run mushroom run
 
-# ── Installation ────────────────────────────────────────────
+report:  ## Build the static report in site/index.html
+	uv run mushroom report
 
-install: ## Créer l'environnement virtuel et installer les dépendances
-	@echo "→ Création de l'environnement virtuel..."
-	python3 -m venv $(VENV)
-	@echo "→ Installation des dépendances..."
-	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
-	@echo "✓ Installation terminée."
+all: data run report  ## Full pipeline
 
-# ── Exécution du pipeline ──────────────────────────────────
+app:  ## Launch the Streamlit dashboard
+	uv run streamlit run app.py
 
-run-all: ## Exécuter l'intégralité du pipeline (00 → 07)
-	@echo "═══ Pipeline complet ═══"
-	$(PYTHON) $(SRC)/00_download.py
-	$(PYTHON) $(SRC)/01_prepare.py
-	$(PYTHON) $(SRC)/02_describe.py
-	$(PYTHON) $(SRC)/03_mca.py
-	$(PYTHON) $(SRC)/04_cluster.py
-	$(PYTHON) $(SRC)/05_discriminant.py
-	$(PYTHON) $(SRC)/06_sensitivity.py
-	$(PYTHON) $(SRC)/07_model_comparison.py
-	@echo ""
-	@echo "✓ Pipeline complet terminé."
+test:  ## Unit tests (offline, < 30 s)
+	uv run pytest -q
 
-run-extended: ## Exécuter les analyses étendues (06 → 07 : Sensibilité, Comparaison)
-	@echo "═══ Analyses étendues ═══"
-	$(PYTHON) $(SRC)/06_sensitivity.py
-	$(PYTHON) $(SRC)/07_model_comparison.py
-	@echo ""
-	@echo "✓ Analyses étendues terminées."
+lint:  ## Lint and format check
+	uv run ruff check .
+	uv run ruff format --check .
 
-# ── Dashboard ─────────────────────────────────────────────
+format:  ## Apply ruff formatting and safe fixes
+	uv run ruff check --fix .
+	uv run ruff format .
 
-dashboard: ## Lancer le dashboard Streamlit interactif
-	$(VENV)/bin/streamlit run app.py
+requirements:  ## Re-export the pinned requirements.txt used by Streamlit Cloud
+	uv export --no-hashes --no-dev --no-emit-project --format requirements-txt -o requirements.txt
 
-# ── Nettoyage ──────────────────────────────────────────────
-
-clean: ## Supprimer les outputs générés (figures, tables, données processées)
-	@echo "→ Suppression des outputs..."
-	rm -f reports/figures/*.png
-	rm -f reports/tables/*.csv
-	rm -f data/processed/*.csv
-	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
-	@echo "✓ Nettoyage terminé."
-
-distclean: clean ## Nettoyage complet (outputs + environnement virtuel)
-	@echo "→ Suppression de l'environnement virtuel..."
-	rm -rf $(VENV)
-	@echo "✓ Nettoyage complet terminé."
+clean:  ## Remove caches and the downloaded raw file
+	rm -rf data/raw .pytest_cache .ruff_cache
