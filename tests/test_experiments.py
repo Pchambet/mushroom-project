@@ -5,6 +5,7 @@ from sklearn.model_selection import StratifiedKFold
 
 from mushroom import experiments as ex
 from mushroom.config import cv_splitter
+from mushroom.pipeline import describe_tree
 
 
 def test_correlation_ratio_hand_cases():
@@ -56,3 +57,31 @@ def test_clusters_table_sums_to_sample(sample):
 def test_smallest_perfect_depth():
     sweep = pd.DataFrame({"depth": [1, 2, 3, 4], "mean": [0.8, 0.99, 1.0, 1.0]})
     assert ex.smallest_perfect_depth(sweep) == 3
+    assert ex.reference_tree_depth(sweep) == 3
+
+
+def test_no_perfect_depth_is_not_reported_as_perfect():
+    sweep = pd.DataFrame({"depth": [1, 2, 3, 4], "mean": [0.8, 0.995, 0.999, 0.998]})
+    assert ex.smallest_perfect_depth(sweep) is None
+    assert ex.reference_tree_depth(sweep) == 3  # best score, not the deepest tree
+
+
+@pytest.mark.parametrize("seed", [0, 13, 42])
+def test_axis_curve_all_axes_point_survives_folds_with_fewer_axes(sample, monkeypatch, seed):
+    # On the 301-row fixture every training fold has fewer MCA axes than the full
+    # sample (rare categories fall out), so a fixed "all axes" count would raise.
+    X, y = sample
+    monkeypatch.setattr(
+        ex, "cv_splitter", lambda: StratifiedKFold(n_splits=5, shuffle=True, random_state=seed)
+    )
+    monkeypatch.setattr(ex, "classifiers", lambda: {"LDA": ex.shrinkage_lda})
+    curve = ex.axis_curve(X, y, grid=[2])
+    assert curve["n_axes"].tolist() == [2, ex.n_mca_axes(X)]
+    assert curve["mean"].between(0.5, 1).all()
+
+
+def test_describe_tree_only_claims_perfection_when_reached():
+    perfect = {"tree_depth": 7, "tree_leaves": 14, "tree_accuracy": 1.0, "tree_is_perfect": True}
+    assert describe_tree(perfect) == "a depth-7 tree (14 leaves) is perfect"
+    short = perfect | {"tree_depth": 6, "tree_accuracy": 0.99963, "tree_is_perfect": False}
+    assert describe_tree(short) == "a depth-6 tree (14 leaves) reaches 99.96%"

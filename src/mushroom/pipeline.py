@@ -26,7 +26,7 @@ def run() -> dict[str, float]:
     cluster_table, ari = ex.clusters(X, y)
     curve = ex.axis_curve(X, y)
     sweep = ex.tree_depth_sweep(X, y)
-    depth = ex.smallest_perfect_depth(sweep)
+    depth = ex.reference_tree_depth(sweep)
     reference = ex.reference_models(X, y, tree_depth=depth)
     folds = ex.fold_ordering(X, y)
 
@@ -45,6 +45,14 @@ def run() -> dict[str, float]:
     RESULTS_JSON.write_text(json.dumps(results, indent=2) + "\n")
     print(f"pipeline finished in {time.perf_counter() - start:.0f} s")
     return results
+
+
+def describe_tree(results: dict) -> str:
+    """ "a depth-7 tree (14 leaves) is perfect", or the score it does reach."""
+    tree = f"a depth-{results['tree_depth']} tree ({results['tree_leaves']} leaves)"
+    if results["tree_is_perfect"]:
+        return f"{tree} is perfect"
+    return f"{tree} reaches {100 * results['tree_accuracy']:.2f}%"
 
 
 def headline(
@@ -80,12 +88,16 @@ def headline(
     )
     eta = inertia.set_index("axis")["eta2_class"]
     linear_axes = inertia[inertia["axis"].between(2, 9)]
-    depth = ex.smallest_perfect_depth(sweep)
+    runner_up = int(eta.loc[2:].idxmax())
+    depth = ex.reference_tree_depth(sweep)
+    tree = sweep.set_index("depth").loc[depth]
+    all_axes = f"MCA, all {len(inertia)} axes"
     return {
         "n_specimens": len(X),
         "n_variables": X.shape[1],
         "n_categories": int(X.nunique().sum()),
         "n_axes": len(inertia),
+        "n_axes_upper_bound": int(X.nunique().sum() - X.shape[1]),
         "n_poisonous": int(y.sum()),
         "poisonous_share": float(y.mean()),
         "total_inertia": float(inertia["eigenvalue"].sum()),
@@ -96,15 +108,21 @@ def headline(
         "eta2_axis1": float(eta.loc[1]),
         "eta2_axis10": float(eta.loc[10]),
         "eta2_axes_2_9_max": float(linear_axes["eta2_class"].max()),
-        "eta2_best_minor_axis": int(eta.loc[21:].idxmax()),
-        "eta2_best_minor_value": float(eta.loc[21:].max()),
+        "eta2_runner_up_axis": runner_up,
+        "eta2_runner_up_value": float(eta.loc[runner_up]),
+        "eta2_runner_up_inertia_pct": float(
+            inertia.set_index("axis").loc[runner_up, "inertia_pct"]
+        ),
         "lda_1_axis": acc("LDA", 1),
         "lda_max_axes_1_9": float(
             curve[(curve["model"] == "LDA") & (curve["n_axes"] <= 9)]["mean"].max()
         ),
         "lda_5_axes": acc("LDA", 5),
         "lda_10_axes": acc("LDA", 10),
-        "lda_all_axes": float(ref("LDA", f"MCA, all {len(inertia)} axes")["cv_accuracy_mean"]),
+        "lda_80_axes": acc("LDA", 80),
+        "lda_all_axes": float(ref("LDA", all_axes)["cv_accuracy_mean"]),
+        "lda_no_shrinkage_all_axes": float(ref(ex.NO_SHRINKAGE, all_axes)["cv_accuracy_mean"]),
+        "lda_no_shrinkage_all_axes_std": float(ref(ex.NO_SHRINKAGE, all_axes)["cv_accuracy_std"]),
         "rf_5_axes": acc("Random forest", 5),
         "knn_5_axes": acc("k-NN (15)", 5),
         "lda_axes_for_99": axes_to_reach("LDA", 0.99),
@@ -116,9 +134,10 @@ def headline(
         "rf_5_poisonous_called_edible": int(
             ref("Random forest", "MCA, 5 axes")["poisonous_called_edible"]
         ),
-        "tree_perfect_depth": depth,
-        "tree_perfect_leaves": int(sweep.loc[sweep["depth"] == depth, "n_leaves"].iloc[0]),
-        "tree_perfect_accuracy": float(sweep.loc[sweep["depth"] == depth, "mean"].iloc[0]),
+        "tree_depth": depth,
+        "tree_leaves": int(tree["n_leaves"]),
+        "tree_accuracy": float(tree["mean"]),
+        "tree_is_perfect": ex.smallest_perfect_depth(sweep) is not None,
         "unshuffled_lda_mean": float(spread.loc[("LDA, 5 axes", "unshuffled (cv=5)"), "mean"]),
         "unshuffled_lda_std": float(spread.loc[("LDA, 5 axes", "unshuffled (cv=5)"), "std"]),
         "shuffled_lda_std": float(spread.loc[("LDA, 5 axes", "shuffled"), "std"]),

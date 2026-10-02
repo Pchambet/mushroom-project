@@ -28,15 +28,28 @@ from mushroom.config import SEED, cv_splitter
 from mushroom.mca import MCA
 
 N_JOBS = 3
-AXIS_GRID = [*range(1, 21), 25, 30, 40, 60]
+AXIS_GRID = [*range(1, 21), 25, 30, 40, 60, 70, 80]
 CLUSTER_AXES = 5
+NO_SHRINKAGE = "LDA, no shrinkage (sklearn default)"
 N_CLUSTERS = 3
+
+
+def shrinkage_lda() -> LinearDiscriminantAnalysis:
+    """LDA with Ledoit-Wolf shrinkage of the within-class covariance.
+
+    On UCI Mushroom the label is an exact linear function of the indicator
+    columns, so with every MCA axis kept the within-class covariance is singular
+    precisely along the discriminant direction. The default SVD solver discards
+    that direction and collapses (see ``reference_models``); shrinkage keeps it.
+    With few axes the two agree to within a few specimens.
+    """
+    return LinearDiscriminantAnalysis(solver="lsqr", shrinkage="auto")
 
 
 def classifiers() -> dict[str, Callable[[], ClassifierMixin]]:
     """A linear reader, a local reader and a flexible reader of the MCA space."""
     return {
-        "LDA": LinearDiscriminantAnalysis,
+        "LDA": shrinkage_lda,
         "k-NN (15)": lambda: KNeighborsClassifier(n_neighbors=15),
         "Random forest": lambda: RandomForestClassifier(
             n_estimators=200, random_state=SEED, n_jobs=N_JOBS
@@ -166,12 +179,13 @@ def reference_models(X: pd.DataFrame, y: pd.Series, tree_depth: int) -> pd.DataF
             onehot_model(DecisionTreeClassifier(), ["odor"]),
             X["odor"].nunique(),
         ),
-        ("LDA", "MCA, 1 axis", mca_model(1, LinearDiscriminantAnalysis()), 1),
-        ("LDA", "MCA, 5 axes", mca_model(5, LinearDiscriminantAnalysis()), 5),
+        ("LDA", "MCA, 1 axis", mca_model(1, shrinkage_lda()), 1),
+        ("LDA", "MCA, 5 axes", mca_model(5, shrinkage_lda()), 5),
         ("k-NN (15)", "MCA, 5 axes", mca_model(5, KNeighborsClassifier(15)), 5),
         ("Random forest", "MCA, 5 axes", mca_model(5, classifiers()["Random forest"]()), 5),
+        ("LDA", f"MCA, all {all_axes} axes", mca_model(None, shrinkage_lda()), all_axes),
         (
-            "LDA",
+            NO_SHRINKAGE,
             f"MCA, all {all_axes} axes",
             mca_model(None, LinearDiscriminantAnalysis()),
             all_axes,
@@ -221,7 +235,7 @@ def fold_ordering(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
         "shuffled": cv_splitter(),
     }
     models = {
-        "LDA, 5 axes": mca_model(5, LinearDiscriminantAnalysis()),
+        "LDA, 5 axes": mca_model(5, shrinkage_lda()),
         "Random forest, 5 axes": mca_model(5, classifiers()["Random forest"]()),
     }
     rows = []
@@ -235,6 +249,13 @@ def fold_ordering(X: pd.DataFrame, y: pd.Series) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-def smallest_perfect_depth(sweep: pd.DataFrame) -> int:
+def smallest_perfect_depth(sweep: pd.DataFrame) -> int | None:
+    """Shallowest depth with 100% out-of-fold accuracy, or None if no depth gets there."""
     perfect = sweep[sweep["mean"] >= 1.0]
-    return int(perfect["depth"].min()) if not perfect.empty else int(sweep["depth"].max())
+    return int(perfect["depth"].min()) if not perfect.empty else None
+
+
+def reference_tree_depth(sweep: pd.DataFrame) -> int:
+    """The tree quoted as a reference: the shallowest perfect one, else the best-scoring."""
+    depth = smallest_perfect_depth(sweep)
+    return depth if depth is not None else int(sweep.loc[sweep["mean"].idxmax(), "depth"])
