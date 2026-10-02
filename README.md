@@ -6,7 +6,6 @@
 ![Python 3.12](https://img.shields.io/badge/python-3.12-0d9488)
 [![License: MIT](https://img.shields.io/badge/license-MIT-64748b)](LICENSE)
 [![Report](https://img.shields.io/badge/report-static%20HTML-d97706)](https://pchambet.github.io/mushroom-project/)
-[![Dashboard](https://img.shields.io/badge/dashboard-Streamlit-0f172a)](https://pchambet-mushroom-project.streamlit.app/)
 
 *Version française : [README.fr.md](README.fr.md)*
 
@@ -72,7 +71,7 @@ K-means (k = 3) on the first five axes recovers part of the structure: adjusted 
 
 ### Interactive views
 
-The [static report](https://pchambet.github.io/mushroom-project/) has the interactive charts. The [Streamlit dashboard](https://pchambet-mushroom-project.streamlit.app/) lets you pick a model and a number of axes and re-runs the cross-validation live (the free hosting tier sleeps when idle; the first load takes a minute).
+The [static report](https://pchambet.github.io/mushroom-project/) has the interactive charts. The [Streamlit dashboard](https://pchambet-mushroom-project.streamlit.app/) lets you pick a model and a number of axes and re-runs the cross-validation live. It is hosted on Streamlit's free tier, which puts it to sleep when idle: if the page says the app has gone to sleep, click the button to wake it up and wait about a minute. `make app` runs the same dashboard locally.
 
 ![Streamlit dashboard, classification page](docs/figures/dashboard.png)
 
