@@ -257,7 +257,8 @@ species, not recognition of a new one. Nothing here is advice on what to eat.</p
 <p>LDA uses Ledoit-Wolf shrinkage throughout. With every axis kept, scikit-learn's default
 LDA (SVD solver) scores {pct(r["lda_no_shrinkage_all_axes"])}: the within-class covariance is
 singular exactly along the direction that separates the classes, and that solver discards it.
-With up to 80 axes the two solvers agree to within a few specimens.</p>
+With up to 80 axes the two solvers never differ by more than
+{r["lda_solver_max_gap_specimens_up_to_80_axes"]} specimens.</p>
 
 <footer>Code, data provenance and tests: <a href="{REPO}">{REPO.removeprefix("https://")}</a>.
 Data: UCI Machine Learning Repository, Mushroom (CC BY 4.0).<br>

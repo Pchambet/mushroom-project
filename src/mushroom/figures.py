@@ -127,11 +127,13 @@ def axis_signal(results: dict) -> None:
     ax.set_ylabel("η² with the edible/poisonous label")
     ax.set_xlim(0, len(inertia) + 1)
     runner_up = results["eta2_runner_up_axis"]
-    ax.set_title(
-        f"Axis {runner_up} holds {results['eta2_runner_up_inertia_pct']:.1f}% of the inertia, "
-        f"yet more of the label than axes 2 to {runner_up - 1}",
-        pad=10,
-    )
+    title = f"After axis 1, axis {runner_up} carries the most label signal"
+    if runner_up > 2:
+        title = (
+            f"Axis {runner_up} holds {results['eta2_runner_up_inertia_pct']:.1f}% of the "
+            f"inertia, yet more of the label than axes 2 to {runner_up - 1}"
+        )
+    ax.set_title(title, pad=10)
     _save(fig, "axis_signal")
 
 

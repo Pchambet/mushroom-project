@@ -9,7 +9,7 @@ inertia (J - Q) / Q, not against the axes that happen to be kept.
 
 J - Q is only an upper bound on the number of axes. When some descriptors are
 exactly determined by others (as on UCI Mushroom), the indicator matrix has a
-lower rank and the remaining singular values are rounding error (~1e-15). Those
+lower rank and the remaining singular values are rounding error. Those
 null axes are dropped: their coordinates are noise, and a model that rescales
 features (LDA, k-NN after scaling) would happily learn from it.
 """

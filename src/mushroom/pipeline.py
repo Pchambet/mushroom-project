@@ -48,7 +48,7 @@ def run() -> dict[str, float]:
 
 
 def describe_tree(results: dict) -> str:
-    """ "a depth-7 tree (14 leaves) is perfect", or the score it does reach."""
+    """Name the reference tree, and call it perfect only if it is."""
     tree = f"a depth-{results['tree_depth']} tree ({results['tree_leaves']} leaves)"
     if results["tree_is_perfect"]:
         return f"{tree} is perfect"
