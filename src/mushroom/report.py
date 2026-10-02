@@ -72,6 +72,8 @@ def axis_curve_chart(results: dict) -> str:
         y=100 * results["odour_accuracy"],
         line={"dash": "dash", "color": SLATE},
         annotation_text="odour alone",
+        # Left end: the curves are still low there, so the label clears the 100% lines.
+        annotation_position="top left",
     )
     return _div(
         _layout(
@@ -150,19 +152,23 @@ def fold_chart() -> str:
 
 
 def reference_table() -> str:
+    """On narrow screens the Features and Edible → poisonous columns are hidden, so the
+    poisonous → edible column the section is about stays on screen; the features then move
+    under the model name to keep the LDA rows apart."""
     ref = _table("reference_models")
     rows = "".join(
         "<tr>"
-        f"<td>{html.escape(r.model)}</td><td>{html.escape(r.features)}</td>"
+        f"<td>{html.escape(r.model)}<span class='narrow'>{html.escape(r.features)}</span></td>"
+        f"<td class='opt'>{html.escape(r.features)}</td>"
         f"<td class='num'>{100 * r.cv_accuracy_mean:.2f} ± {100 * r.cv_accuracy_std:.2f}</td>"
         f"<td class='num'>{r.poisonous_called_edible}</td>"
-        f"<td class='num'>{r.edible_called_poisonous}</td>"
+        f"<td class='num opt'>{r.edible_called_poisonous}</td>"
         "</tr>"
         for r in ref.itertuples()
     )
     return (
-        "<div class='scroll'><table><thead><tr><th>Model</th><th>Features</th>"
-        "<th>Accuracy (%)</th><th>Poisonous → edible</th><th>Edible → poisonous</th>"
+        "<div class='scroll'><table><thead><tr><th>Model</th><th class='opt'>Features</th>"
+        "<th>Accuracy (%)</th><th>Poisonous → edible</th><th class='opt'>Edible → poisonous</th>"
         f"</tr></thead><tbody>{rows}</tbody></table></div>"
     )
 
@@ -190,7 +196,11 @@ table{border-collapse:collapse;width:100%;font-size:.92rem}
 th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
 th{color:var(--muted);font-weight:600}
 td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.narrow{display:none}
 a{color:var(--accent)}
+@media (max-width:600px){.opt{display:none}
+.narrow{display:block;color:var(--muted);font-size:.85em}
+table{font-size:.85rem}th,td{padding:6px 6px}}
 footer{color:var(--muted);font-size:.9rem;margin-top:56px;border-top:1px solid var(--line);
 padding-top:16px}
 """
