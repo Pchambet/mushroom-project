@@ -9,7 +9,7 @@ setup:  ## Create the environment from uv.lock
 data:  ## Download (cached, checksum-verified) and tidy the UCI file
 	uv run mushroom data
 
-run:  ## Run every experiment and redraw the README figures (5-10 min)
+run:  ## Run every experiment and redraw the README figures (about 3 min)
 	uv run mushroom run
 
 report:  ## Build the static report in site/index.html
@@ -20,7 +20,7 @@ all: data run report  ## Full pipeline
 app:  ## Launch the Streamlit dashboard
 	uv run streamlit run app.py
 
-test:  ## Unit tests (offline, < 30 s)
+test:  ## Unit tests (offline, a few seconds)
 	uv run pytest -q
 
 lint:  ## Lint and format check

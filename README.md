@@ -1,6 +1,6 @@
 # mushroom-project
 
-**What does a multiple correspondence analysis (MCA) keep, and lose, when it squeezes 21 categorical descriptors into a handful of axes? An honestly cross-validated study on the UCI Mushroom data.**
+**Five multiple correspondence analysis (MCA) axes keep enough of the toxicity signal in the UCI Mushroom data for a random forest (99.8%) but not for LDA (88.2%), and the first version of this study missed it because of unshuffled folds.**
 
 [![ci](https://github.com/Pchambet/mushroom-project/actions/workflows/ci.yml/badge.svg)](https://github.com/Pchambet/mushroom-project/actions/workflows/ci.yml)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-0d9488)
@@ -18,7 +18,7 @@
 - **Five MCA axes keep the signal, but not in a linear form.** On the same five axes, LDA scores 88.2% while a random forest scores 99.8% and a 15-nearest-neighbour vote 99.3%. LDA stays at or below 88.8% up to nine axes and needs 19 axes to reach 99%. With all 85 axes it is 100% accurate, because the label is an exact linear function of the 116 indicator columns: what LDA cannot read is the five-axis compression, not the data.
 - **Inertia is not relevance.** Axis 1 carries half the label (η² = 0.51); axes 2 to 9 carry at most 0.09, while axis 10, with only 2.3% of the inertia, reaches 0.14, and LDA jumps from 88.3% to 95.5% when it enters. Choosing axes by explained inertia throws away part of what a supervised model needs.
 - **The decision-relevant error is asymmetric.** All 120 errors of the odour rule are poisonous mushrooms called edible (odourless poisonous species); LDA on five axes makes 816 such errors, the random forest 10.
-- **The first version of this project drew conclusions from a cross-validation artefact.** Unshuffled folds on the sorted UCI file produced a ±14.8-point spread that was read as an "unstable model" and an "overfitting" random forest. With shuffled stratified folds the spread is ±1.0 point and the random forest is the best model on MCA axes.
+- **The first version of this project misread its cross-validation.** scikit-learn's `cv=5` is stratified but not shuffled, and the UCI file is ordered by descriptor pattern (roughly by species), so each test fold was a contiguous block whose categories may never appear in training. The resulting ±14.8-point spread was read as an "unstable model" and an "overfitting" random forest. With shuffled stratified folds the spread is ±1.0 point and the random forest is the best model on MCA axes.
 
 ## Why it matters
 
@@ -64,7 +64,7 @@ Mean ± standard deviation over the five folds; the no-shrinkage row is a solver
 
 ![Per-fold accuracy with unshuffled versus shuffled folds](docs/figures/fold_ordering.png)
 
-scikit-learn's `cv=5` does not shuffle, and the UCI file is sorted in long same-class runs, so each fold was a different slice of the catalogue. Re-running that protocol on the current pipeline gives LDA 81.9% ± 14.8% and random forest 85.2% ± 15.0% on five axes; shuffled folds give 88.2% ± 1.0% and 99.8% ± 0.1%. The first version of this README read the spread as instability, read the random forest's train/test gap as overfitting, picked "k = 4 axes" as optimal from noise, stated that 8 axes hold 90% of the information (they hold 90% of the *first ten* axes, which together hold 48.3% of the total inertia), and described edible recall (97.6%) as "when the model says edible, it is right 97.6% of the time" (that is precision, which was 83.5%). All of these are corrected here.
+scikit-learn's `cv=5` is stratified but not shuffled. Every unshuffled test fold is 48.2% poisonous, so the class mix is not the problem. The UCI file is ordered by descriptor pattern (roughly by species), so each test fold is a contiguous block whose categories may never appear in training: in fold 5, 346 of the 1,624 specimens carry one of 14 categories that its training folds never show, while folds 2 and 4 have none ([`fold_ordering.csv`](reports/tables/fold_ordering.csv)). Shuffled folds have none at all. Re-running that protocol on the current pipeline gives LDA 81.9% ± 14.8% and random forest 85.2% ± 15.0% on five axes; shuffled folds give 88.2% ± 1.0% and 99.8% ± 0.1%. The first version of this README read the spread as instability, read the random forest's train/test gap as overfitting, picked "k = 4 axes" as optimal from noise, stated that 8 axes hold 90% of the information (they hold 90% of the *first ten* axes, which together hold 48.3% of the total inertia), and described edible recall (97.6%) as "when the model says edible, it is right 97.6% of the time" (that is precision, which was 83.5%). All of these are corrected here. The unshuffled spread is not pure noise either: it is a rough proxy for performance on species missing from training, which shuffled folds cannot measure (see limitations).
 
 ### Clusters without labels
 
@@ -82,13 +82,13 @@ The [static report](https://pchambet.github.io/mushroom-project/) has the intera
 git clone https://github.com/Pchambet/mushroom-project.git && cd mushroom-project
 make setup     # uv sync --locked (Python 3.12)
 make data      # download + verify the UCI file (373 KB), write data/processed/mushroom.csv
-make run       # every experiment, tables in reports/, figures in docs/figures/ (about 6 min of CPU time; 6 to 10 min wall-clock)
+make run       # every experiment, tables in reports/, figures in docs/figures/ (about 3 min wall clock on a laptop, about 5 min CPU)
 make report    # site/index.html
 make app       # optional: the Streamlit dashboard
 make test lint
 ```
 
-Everything runs on a laptop CPU (random forests use three cores); the environment takes about 570 MB of disk. `uv run mushroom all` chains data, run and report.
+Everything runs on a laptop CPU (random forests use three cores); the environment takes about 570 MB of disk. `uv run mushroom all` chains data, run and report. Re-running it reproduces the committed tables, `results.json` and figures byte for byte (checked on macOS arm64).
 
 ## Repository layout
 
@@ -102,18 +102,21 @@ src/mushroom/
   report.py       static HTML report (site/index.html)
   cli.py          `mushroom {data,run,figures,report,all}`
 app.py            Streamlit dashboard
-tests/            unit tests on a 301-row fixture of the real file (offline, ~15 s)
+tests/            unit tests on a 301-row fixture of the real file (offline, a few seconds)
+reports/          tables/*.csv + results.json (every number quoted)
+docs/figures/     README figures
+site/index.html   static report
 data/processed/mushroom.csv  decoded copy, committed so the hosted dashboard starts without a download (CC BY 4.0)
 ```
 
 ## Methodology notes and limitations
 
-- **Hypothetical specimens.** The UCI records are hypothetical samples generated from *The Audubon Society Field Guide to North American Mushrooms* for 23 species of *Agaricus* and *Lepiota*, not field observations. Specimens of the same species land in both training and test folds, so the scores measure recognition within known species, not generalisation to a new one; the file has no species label to build group-wise folds. Nothing here is foraging advice.
+- **Hypothetical specimens.** The UCI records are hypothetical samples generated from *The Audubon Society Field Guide to North American Mushrooms* for 23 species of *Agaricus* and *Lepiota*, not field observations. Specimens of the same species land in both training and test folds, so the scores measure recognition within known species, not generalisation to a new one; the file has no species label to build group-wise folds. The unshuffled folds above are the closest thing in this repository to that harder test, and they score far lower on their worst blocks (about 60% for both LDA and the random forest on fold 5). Nothing here is foraging advice.
 - **Descriptive MCA outputs** (η², the axis-1 table, clusters) are computed on the full dataset; all supervised scores refit the MCA per fold.
 - **η² is computed one axis at a time.** It shows where the label lives, not how axes combine. It does line up with the curve: LDA jumps from 88.3% to 95.5% exactly when axis 10 (η² = 0.14) enters.
-- **Numerical rank.** J − Q = 95 is an upper bound. The centred indicator matrix has rank 85; the ten remaining singular values sit below numpy's matrix-rank tolerance (rounding error) and are dropped. Keeping them is not harmless: the rounding noise is a deterministic function of each row's category pattern, so a null axis can show a sizeable η² with the label, and default LDA, which rescales every column to unit variance, learns from it.
+- **Numerical rank.** J − Q = 95 is an upper bound. The centred indicator matrix has rank 85; the ten remaining singular values sit below numpy's matrix-rank tolerance (rounding error) and are dropped. Keeping them is not harmless: the rounding noise is a deterministic function of each row's category pattern, so a null axis can correlate with the label: in an earlier version that kept them, rounding-error axis 90 reached η² = 0.34, more than any real axis except axis 1, and default LDA, which rescales every column to unit variance, can learn from such an axis.
 - **LDA solver.** The label is an exact linear function of the indicators (least-squares residual 2e-14), so with all 85 axes the within-class covariance is singular along the very direction that separates the classes. scikit-learn's default SVD solver discards that direction and scores 64.5%; Ledoit-Wolf shrinkage keeps it and scores 100%. Up to 80 axes the two solvers never differ by more than 4 specimens (both curves are in [`axis_curve.csv`](reports/tables/axis_curve.csv)); shrinkage is used throughout.
-- **Five folds, one seed.** Fold-to-fold standard deviations are reported; differences below about one standard deviation (for example k-NN versus random forest on five axes) should not be over-read.
+- **Five folds, one seed.** Fold-to-fold standard deviations are reported; differences below about one standard deviation (for example LDA on one axis versus five axes, 88.58 ± 0.68 against 88.21 ± 0.97) should not be over-read.
 - **Model choices are deliberately plain** (shrinkage LDA, k-NN with k = 15, 200-tree random forest); no hyperparameter search was run, which keeps the comparison about the representation rather than the tuning.
 
 ## References
